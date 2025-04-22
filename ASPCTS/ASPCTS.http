@@ -1,0 +1,6 @@
+@ASPCTS_HostAddress = http://localhost:5023
+
+GET {{ASPCTS_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

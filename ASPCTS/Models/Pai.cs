@@ -1,0 +1,17 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace ASPCTS.Models
+{
+    public class Pai : Usuario
+    {
+        // Relacionamento com as crianças
+        public ICollection<Crianca> Criancas { get; set; } = new List<Crianca>();
+
+
+        public int? PsicologoId { get; set; }
+        public Psicologo? Psicologo { get; set; }
+    }
+}
