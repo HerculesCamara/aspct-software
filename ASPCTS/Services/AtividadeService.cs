@@ -25,7 +25,8 @@ namespace ASPCTS.Services
 
         public async Task<Atividade?> GetAtividadeByIdAsync(int id)
         {
-            return await _atividadeRepository.GetAtividadeByIdAsync(id);
+            var atividade = await _atividadeRepository.GetAtividadeByIdAsync(id);
+            return atividade;
         }
 
         public async Task<IEnumerable<Atividade>> GetAtividadeByTituloAsync(string titulo)

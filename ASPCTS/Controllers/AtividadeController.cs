@@ -1,34 +1,38 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using ASPCTS.DTOs;
+using ASPCTS.DTOs.Atividade;
 using ASPCTS.Models;
 using ASPCTS.Services;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ASPCTS.Controllers
 {
-    [Microsoft.AspNetCore.Mvc.Route("api/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class AtividadeController : ControllerBase
     {
         private readonly IAtividadeService _atividadeService;
-        public AtividadeController(IAtividadeService atividadeService)
+        private readonly IMapper _mapper;
+
+        public AtividadeController(IAtividadeService atividadeService, IMapper mapper)
         {
             _atividadeService = atividadeService;
+            _mapper = mapper;
         }
 
-        //GET: api/atividade
         [HttpGet("BuscarTodasAtividades")]
-        [ProducesResponseType(typeof(IEnumerable<Atividade>), 200)]
+        [ProducesResponseType(typeof(IEnumerable<AtividadeDTO>), 200)]
         public async Task<IActionResult> GetAllAtividades()
         {
             var atividades = await _atividadeService.GetAllAtividadesAsync();
-            return Ok(atividades);
+            var atividadesDto = _mapper.Map<IEnumerable<AtividadeDTO>>(atividades);
+            return Ok(atividadesDto);
         }
-        //GET: api/atividade/{id}
+
         [HttpGet("BuscarAtividadeId/{id}")]
-        [ProducesResponseType(typeof(Atividade), 200)]
+        [ProducesResponseType(typeof(AtividadeDTO), 200)]
         public async Task<IActionResult> GetAtividadeById(int id)
         {
             var atividade = await _atividadeService.GetAtividadeByIdAsync(id);
@@ -36,68 +40,44 @@ namespace ASPCTS.Controllers
             {
                 return NotFound();
             }
-            return Ok(atividade);
+            var atividadeDto = _mapper.Map<AtividadeDTO>(atividade);
+            return Ok(atividadeDto);
         }
-        //POST: api/atividade
+
         [HttpPost("AdicionarAtividade")]
-        [ProducesResponseType(typeof(Atividade), 201)]
-        public async Task<IActionResult> AddAtividade([FromBody] Atividade atividade)
+        [ProducesResponseType(typeof(AtividadeDTO), 201)]
+        public async Task<IActionResult> AddAtividade([FromBody] AtividadeCreateDTO atividadeDto)
         {
-            if (atividade == null)
+            if (atividadeDto == null)
             {
                 return BadRequest("Atividade não pode ser nula.");
             }
 
-            try
-            {
-                await _atividadeService.AddAtividadeAsync(atividade);
-                return CreatedAtAction(nameof(GetAtividadeById), new { id = atividade.Id }, atividade);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, "Erro interno ao adicionar a atividade.");
-            }
+            var atividade = _mapper.Map<Atividade>(atividadeDto);
+            await _atividadeService.AddAtividadeAsync(atividade);
+            var atividadeResultDto = _mapper.Map<AtividadeDTO>(atividade);
+            return CreatedAtAction(nameof(GetAtividadeById), new { id = atividade.Id }, atividadeResultDto);
         }
 
         [HttpPut("AtualizarAtividade/{id}")]
-        public async Task<IActionResult> UpdateAtividade(int id, Atividade atividadeAtualizada)
+        public async Task<IActionResult> UpdateAtividade(int id, [FromBody] AtividadeUpdateDTO atividadeDto)
         {
-            if (atividadeAtualizada == null || id != atividadeAtualizada.Id)
+            if (atividadeDto == null)
             {
-                return BadRequest("Atividade não encontrada ou IDs incompatíveis.");
+                return BadRequest("Dados inválidos para atualização.");
             }
 
-            var existingAtividade = await _atividadeService.GetAtividadeByIdAsync(id);
-            if (existingAtividade == null)
+            var atividadeExistente = await _atividadeService.GetAtividadeByIdAsync(id);
+            if (atividadeExistente == null)
             {
                 return NotFound("Atividade não encontrada.");
             }
 
-            // Verifique se o status de conclusão foi fornecido
-            if (atividadeAtualizada.Concluida == null)
-            {
-                return BadRequest("O status de conclusão deve ser informado.");
-            }
-
-            // Atualização de campos com base nos valores fornecidos
-            existingAtividade.Titulo = !string.IsNullOrWhiteSpace(atividadeAtualizada.Titulo) ? atividadeAtualizada.Titulo : existingAtividade.Titulo;
-            existingAtividade.Descricao = !string.IsNullOrWhiteSpace(atividadeAtualizada.Descricao) ? atividadeAtualizada.Descricao : existingAtividade.Descricao;
-            if (atividadeAtualizada.Concluida.HasValue)
-            {
-                existingAtividade.Concluida = atividadeAtualizada.Concluida.Value;
-            }
-
-            // Atualizando a atividade no banco de dados
-            await _atividadeService.UpdateAtividadeAsync(existingAtividade);
-
-            return NoContent(); // Retorna 204 - No Content, indicando que a atualização foi bem-sucedida.
+            _mapper.Map(atividadeDto, atividadeExistente);
+            await _atividadeService.UpdateAtividadeAsync(atividadeExistente);
+            return NoContent();
         }
 
-        //DELETE: api/atividade/{id}
         [HttpDelete("DeletarAtividade/{id}")]
         [ProducesResponseType(204)]
         public async Task<IActionResult> DeleteAtividade(int id)
@@ -107,6 +87,7 @@ namespace ASPCTS.Controllers
             {
                 return NotFound();
             }
+
             await _atividadeService.DeleteAtividadeAsync(id);
             return NoContent();
         }

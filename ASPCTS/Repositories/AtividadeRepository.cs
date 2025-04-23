@@ -27,7 +27,6 @@ namespace ASPCTS.Repositories
         public async Task<Atividade?> GetAtividadeByIdAsync(int id)
         {
             return await _context.Atividades
-                .Include(a => a.Crianca)
                 .FirstOrDefaultAsync(a => a.Id == id);
         }
 

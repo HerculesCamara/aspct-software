@@ -504,3 +504,6 @@ C:\Users\gusta\Desktop\API\ASPCTS\obj\Debug\net8.0\ASPCTS.genruntimeconfig.cache
 C:\Users\gusta\Desktop\API\ASPCTS\obj\Debug\net8.0\ref\ASPCTS.dll
 C:\Users\gusta\Desktop\API\aspcts\bin\Debug\net8.0\Microsoft.AspNetCore.JsonPatch.dll
 C:\Users\gusta\Desktop\API\aspcts\bin\Debug\net8.0\Newtonsoft.Json.dll
+C:\Users\gusta\Desktop\API\aspcts\obj\Debug\net8.0\ASPCTS.sourcelink.json
+C:\Users\gusta\Desktop\API\aspcts\bin\Debug\net8.0\AutoMapper.dll
+C:\Users\gusta\Desktop\API\aspcts\bin\Debug\net8.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll

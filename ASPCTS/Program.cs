@@ -1,4 +1,5 @@
 using ASPCTS.Context;
+using ASPCTS.Mappings;
 using ASPCTS.Repositories;
 using ASPCTS.Services;
 using Microsoft.EntityFrameworkCore;
@@ -52,7 +53,19 @@ builder.Services.AddSwaggerGen(
 }
 );
 
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins",
+        builder =>
+        {
+            builder.AllowAnyOrigin()
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
+        });
+});
 
 var app = builder.Build();
 

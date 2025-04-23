@@ -1,105 +1,86 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using ASPCTS.DTOs;
 using ASPCTS.Models;
 using ASPCTS.Services;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Client;
+using AutoMapper;
+using ASPCTS.DTOs.Pai;
 
 namespace ASPCTS.Controllers
 {
     [ApiController]
-    [Microsoft.AspNetCore.Components.Route("api/[controller]")]
+    [Route("api/[controller]")]
     public class PaiController : ControllerBase
     {
         private readonly IPaiService _paiService;
-        public PaiController(IPaiService paiService)
+        private readonly IMapper _mapper;
+
+        public PaiController(IPaiService paiService, IMapper mapper)
         {
             _paiService = paiService;
+            _mapper = mapper;
         }
 
-        //GET: api/pai
         [HttpGet("BuscarTodosPais")]
-        [ProducesResponseType(typeof(IEnumerable<Pai>), 200)]
+        [ProducesResponseType(typeof(IEnumerable<PaiDTO>), 200)]
         public async Task<IActionResult> GetAllPais()
         {
             var pais = await _paiService.GetAllPaisAsync();
-            return Ok(pais);
+            var paisDto = _mapper.Map<IEnumerable<PaiDTO>>(pais);
+            return Ok(paisDto);
         }
-        //GET: api/pai/{id}
+
         [HttpGet("BuscarPorPaiId/{id}")]
-        [ProducesResponseType(typeof(Pai), 200)]
+        [ProducesResponseType(typeof(PaiDTO), 200)]
         public async Task<IActionResult> GetPaiById(int id)
         {
             var pai = await _paiService.GetPaiByIdAsync(id);
             if (pai == null)
-            {
                 return NotFound();
-            }
-            return Ok(pai);
+
+            var paiDto = _mapper.Map<PaiDTO>(pai);
+            return Ok(paiDto);
         }
-        //POST: api/pai
+
         [HttpPost("AdicionarPai")]
-        [ProducesResponseType(typeof(Pai), 201)]
-        public async Task<IActionResult> AddPai(Pai pai)
+        [ProducesResponseType(typeof(PaiDTO), 201)]
+        public async Task<IActionResult> AddPai([FromBody] PaiCreateDTO novoPaiDto)
         {
-            if (pai == null)
-                return BadRequest("Objeto Pai está nulo.");
+            if (novoPaiDto == null)
+                return BadRequest("Dados inválidos.");
 
-            // Garante que o tipo será sempre "Pai"
-            pai.Tipo = "Pai";
-
-            // Verifica se CPF já existe
-            var existingPai = await _paiService.GetPaiByCPFAsync(pai.CPF);
-            if (existingPai != null)
+            var existente = await _paiService.GetPaiByCPFAsync(novoPaiDto.CPF);
+            if (existente != null)
                 return Conflict("Já existe um pai cadastrado com esse CPF.");
 
+            var pai = _mapper.Map<Pai>(novoPaiDto);
+            pai.Tipo = "Pai";
+
             await _paiService.AddPaiAsync(pai);
-
-            return CreatedAtAction(nameof(GetPaiById), new { id = pai.Id }, pai);
+            var paiCriado = _mapper.Map<PaiDTO>(pai);
+            return CreatedAtAction(nameof(GetPaiById), new { id = pai.Id }, paiCriado);
         }
-        //PUT: api/pai/{id}
+
         [HttpPut("AtualizarPai/{id}")]
-        [ProducesResponseType(typeof(Pai), 204)]
-        public async Task<IActionResult> UpdatePai(int id, Pai paiAtualizado)
+        [ProducesResponseType(204)]
+        public async Task<IActionResult> UpdatePai(int id, [FromBody] PaiUpdateDTO paiDto)
         {
-            if (paiAtualizado == null || id != paiAtualizado.Id)
-            {
-                return BadRequest("Pai não encontrado ou IDs incompatíveis.");
-            }
-
-            var existingPai = await _paiService.GetPaiByIdAsync(id);
-            if (existingPai == null)
-            {
+            var paiExistente = await _paiService.GetPaiByIdAsync(id);
+            if (paiExistente == null)
                 return NotFound("Pai não encontrado.");
-            }
 
-            // Atualização de campos com base nos valores fornecidos
-            existingPai.Name = !string.IsNullOrWhiteSpace(paiAtualizado.Name) ? paiAtualizado.Name : existingPai.Name;
-            existingPai.CPF = !string.IsNullOrWhiteSpace(paiAtualizado.CPF) ? paiAtualizado.CPF : existingPai.CPF;
-            existingPai.Phone = !string.IsNullOrWhiteSpace(paiAtualizado.Phone) ? paiAtualizado.Phone : existingPai.Phone;
-            existingPai.Email = !string.IsNullOrWhiteSpace(paiAtualizado.Email) ? paiAtualizado.Email : existingPai.Email;
-            existingPai.DataNascimento = paiAtualizado.DataNascimento != default(DateTimeOffset) ? paiAtualizado.DataNascimento : existingPai.DataNascimento;
-            existingPai.Password = !string.IsNullOrWhiteSpace(paiAtualizado.Password) ? paiAtualizado.Password : existingPai.Password;
-            existingPai.PsicologoId = paiAtualizado.PsicologoId != default(int) ? paiAtualizado.PsicologoId : existingPai.PsicologoId;
-
-            // Atualizando o pai no banco de dados
-            await _paiService.UpdatePaiAsync(existingPai);
-
-            return NoContent(); // Retorna 204 - No Content, indicando que a atualização foi bem-sucedida.
+            _mapper.Map(paiDto, paiExistente);
+            await _paiService.UpdatePaiAsync(paiExistente);
+            return NoContent();
         }
-        //DELETE: api/pai/{id}
-        [HttpDelete("DeletarPai/{id}")]
 
+        [HttpDelete("DeletarPai/{id}")]
+        [ProducesResponseType(204)]
         public async Task<IActionResult> DeletePai(int id)
         {
             var pai = await _paiService.GetPaiByIdAsync(id);
             if (pai == null)
-            {
                 return NotFound();
-            }
+
             await _paiService.DeletePaiAsync(id);
             return NoContent();
         }
