@@ -1,6 +1,7 @@
 ## README - API para Gestão de Atividades para Crianças
 
 Este README fornece informações sobre a API desenvolvida em .NET com Entity Framework Core e SQL Server para gerenciar atividades de crianças, pais e psicólogos.
+Repositório do frontend: https://github.com/HerculesCamara/aspct-frontend
 
 ### Tecnologias Utilizadas
 
