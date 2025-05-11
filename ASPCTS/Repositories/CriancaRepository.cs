@@ -28,12 +28,10 @@ namespace ASPCTS.Repositories
 
         public async Task<Crianca?> GetCriancaByIdAsync(int id)
         {
-            return await _context.Criancas
-                .Include(c => c.Pai)
-                .Include(c => c.Psicologo)
-                .Include(c => c.Atividades)
-                .FirstOrDefaultAsync(c => c.Id == id);
+            return await _context.Criancas.FirstOrDefaultAsync(c => c.Id == id);
         }
+
+
 
         public async Task<IEnumerable<Crianca>> GetCriancaByNameAsync(string name)
         {
@@ -66,12 +64,22 @@ namespace ASPCTS.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteCriancaAsync(int id)
+        public async Task DesativarCriancaAsync(int id)
         {
             var crianca = await GetCriancaByIdAsync(id);
             if (crianca != null)
             {
-                _context.Criancas.Remove(crianca);
+                crianca.Ativo = false; // Desativar a criança
+                _context.Criancas.Update(crianca);
+                // Desativar todas as atividades associadas
+                var atividades = await _context.Atividades
+                    .Where(a => a.CriancaId == crianca.Id)
+                    .ToListAsync();
+                foreach (var atividade in atividades)
+                {
+                    atividade.Ativo = false; // Desativar a atividade
+                    _context.Atividades.Update(atividade);
+                }
                 await _context.SaveChangesAsync();
             }
         }

@@ -71,7 +71,7 @@ namespace ASPCTS.Services
             await _criancaRepository.UpdateCriancaAsync(crianca);
         }
         
-        public async Task DeleteCriancaAsync(int id)
+        public async Task DesativarCriancaAsync(int id)
         {
             var criancas = await _criancaRepository.GetAllCriancasAsync();
 
@@ -80,8 +80,14 @@ namespace ASPCTS.Services
             {
                 throw new Exception("Criança não encontrada.");
             }
+            //Verifica se a criança já está desativada
+            var crianca = await _criancaRepository.GetCriancaByIdAsync(id);
+            if (crianca != null && !crianca.Ativo)
+            {
+                throw new Exception("Criança já está desativada.");
+            }
 
-            await _criancaRepository.DeleteCriancaAsync(id);
+            await _criancaRepository.DesativarCriancaAsync(id);
         }
     }
 }

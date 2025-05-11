@@ -12,18 +12,18 @@ namespace ASPCTS.Controllers
 {
     [Microsoft.AspNetCore.Mvc.Route("api/[controller]")]
     [ApiController]
-    public class PsicologoController : ControllerBase
+    public class psicologoController : ControllerBase
     {
         private readonly IPsicologoService _psicologoService;
         private readonly IMapper _mapper;
-        public PsicologoController(IPsicologoService psicologoService, IMapper mapper)
+        public psicologoController(IPsicologoService psicologoService, IMapper mapper)
         {
             _psicologoService = psicologoService;
             _mapper = mapper;
         }
 
         //GET: api/psicologo
-        [HttpGet("BuscarTodosPsicologos")]
+        [HttpGet("buscar-todos-psicologos")]
         [ProducesResponseType(typeof(IEnumerable<PsicologoDTO>), 200)]
         public async Task<IActionResult> GetAllPsicologos()
         {
@@ -32,7 +32,7 @@ namespace ASPCTS.Controllers
         }
 
         //GET: api/psicologo/{id}
-        [HttpGet("BuscarPorPsicologoId/{id}")]
+        [HttpGet("buscar-psicologo-por-id/{id}")]
         [ProducesResponseType(typeof(PsicologoDTO), 200)]
         public async Task<IActionResult> GetPsicologoById(int id)
         {
@@ -46,7 +46,7 @@ namespace ASPCTS.Controllers
         }
 
         //POST: api/psicologo
-        [HttpPost("AdicionarPsicologo")]
+        [HttpPost("adicionar-psicologo")]
         [ProducesResponseType(typeof(Psicologo), 201)]
         public async Task<IActionResult> AddPsicologo(PsicologoCreateDTO novoPsicologoDto)
         {
@@ -70,9 +70,10 @@ namespace ASPCTS.Controllers
         }
 
         // PUT: api/psicologo/{id}
-        [HttpPut("AtualizarPsicologo/{id}")]
-        [ProducesResponseType(typeof(Psicologo), 204)]
-        public async Task<IActionResult> UpdatePsicologo(int id, PsicologoUpdateDTO psicologoAtualizado)
+        [HttpPatch("atualizar-psicologo/{id}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> UpdatePsicologoParcial(int id, [FromBody] PsicologoUpdateDTO psicologoDto)
         {
             var psicologoExistente = await _psicologoService.GetPsicologoByIdAsync(id);
             if (psicologoExistente == null)
@@ -80,15 +81,37 @@ namespace ASPCTS.Controllers
                 return NotFound("Psicólogo não encontrado.");
             }
 
-            _mapper.Map(psicologoAtualizado, psicologoExistente); // Mapeia os dados atualizados para o psicólogo existente
-            await _psicologoService.UpdatePsicologoAsync(psicologoExistente); // Atualiza o psicólogo no banco de dados
+            // Atualiza somente os campos enviados no DTO
+            if (!string.IsNullOrWhiteSpace(psicologoDto.Name))
+                psicologoExistente.Name = psicologoDto.Name;
 
-            return NoContent(); // Retorna 204 - No Content, indicando que a atualização foi bem-sucedida.
+            if (!string.IsNullOrWhiteSpace(psicologoDto.Email))
+                psicologoExistente.Email = psicologoDto.Email;
+
+            if (!string.IsNullOrWhiteSpace(psicologoDto.Password))
+                psicologoExistente.Password = psicologoDto.Password;
+
+            if (!string.IsNullOrWhiteSpace(psicologoDto.Phone))
+                psicologoExistente.Phone = psicologoDto.Phone;
+
+            if (!string.IsNullOrWhiteSpace(psicologoDto.CPF))
+                psicologoExistente.CPF = psicologoDto.CPF;
+
+            if (psicologoDto.DataNascimento.HasValue)
+                psicologoExistente.DataNascimento = psicologoDto.DataNascimento.Value;
+
+            if (!string.IsNullOrWhiteSpace(psicologoDto.CRP))
+                psicologoExistente.CRP = psicologoDto.CRP;
+
+            await _psicologoService.UpdatePsicologoAsync(psicologoExistente);
+
+            return NoContent();
         }
 
 
+
         //DELETE: api/psicologo/{id}
-        [HttpDelete("DeletarPsicologo/{id}")]
+        [HttpDelete("desativar-psicologo/{id}")]
         [ProducesResponseType(typeof(Psicologo), 204)]
         public async Task<IActionResult> DeletePsicologo(int id)
         {
@@ -97,7 +120,7 @@ namespace ASPCTS.Controllers
             {
                 return NotFound();
             }
-            await _psicologoService.DeletePsicologoAsync(id);
+            await _psicologoService.DesativarPsicologoAsync(id);
             return NoContent();
         }
     }

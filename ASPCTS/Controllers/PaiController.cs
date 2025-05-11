@@ -9,18 +9,18 @@ namespace ASPCTS.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class PaiController : ControllerBase
+    public class paiController : ControllerBase
     {
         private readonly IPaiService _paiService;
         private readonly IMapper _mapper;
 
-        public PaiController(IPaiService paiService, IMapper mapper)
+        public paiController(IPaiService paiService, IMapper mapper)
         {
             _paiService = paiService;
             _mapper = mapper;
         }
 
-        [HttpGet("BuscarTodosPais")]
+        [HttpGet("buscar-todos-pais")]
         [ProducesResponseType(typeof(IEnumerable<PaiDTO>), 200)]
         public async Task<IActionResult> GetAllPais()
         {
@@ -29,7 +29,7 @@ namespace ASPCTS.Controllers
             return Ok(paisDto);
         }
 
-        [HttpGet("BuscarPorPaiId/{id}")]
+        [HttpGet("buscar-pai-por-id/{id}")]
         [ProducesResponseType(typeof(PaiDTO), 200)]
         public async Task<IActionResult> GetPaiById(int id)
         {
@@ -41,7 +41,7 @@ namespace ASPCTS.Controllers
             return Ok(paiDto);
         }
 
-        [HttpPost("AdicionarPai")]
+        [HttpPost("adicionar-pai")]
         [ProducesResponseType(typeof(PaiDTO), 201)]
         public async Task<IActionResult> AddPai([FromBody] PaiCreateDTO novoPaiDto)
         {
@@ -60,20 +60,42 @@ namespace ASPCTS.Controllers
             return CreatedAtAction(nameof(GetPaiById), new { id = pai.Id }, paiCriado);
         }
 
-        [HttpPut("AtualizarPai/{id}")]
+        [HttpPatch("atualizar-pai/{id}")]
+        [ProducesResponseType(400)]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> UpdatePai(int id, [FromBody] PaiUpdateDTO paiDto)
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> UpdatePaiParcial(int id, [FromBody] PaiUpdateDTO paiDto)
         {
             var paiExistente = await _paiService.GetPaiByIdAsync(id);
             if (paiExistente == null)
                 return NotFound("Pai não encontrado.");
 
-            _mapper.Map(paiDto, paiExistente);
+            // Atualiza apenas os campos fornecidos no DTO
+            if (!string.IsNullOrWhiteSpace(paiDto.Name))
+                paiExistente.Name = paiDto.Name;
+
+            if (!string.IsNullOrWhiteSpace(paiDto.Email))
+                paiExistente.Email = paiDto.Email;
+
+            if (!string.IsNullOrWhiteSpace(paiDto.Password))
+                paiExistente.Password = paiDto.Password;
+
+            if (!string.IsNullOrWhiteSpace(paiDto.Phone))
+                paiExistente.Phone = paiDto.Phone;
+
+            if (!string.IsNullOrWhiteSpace(paiDto.CPF))
+                paiExistente.CPF = paiDto.CPF;
+
+            if (paiDto.DataNascimento.HasValue)
+                paiExistente.DataNascimento = paiDto.DataNascimento.Value;
+
             await _paiService.UpdatePaiAsync(paiExistente);
+
             return NoContent();
         }
 
-        [HttpDelete("DeletarPai/{id}")]
+
+        [HttpDelete("desativar-pai/{id}")]
         [ProducesResponseType(204)]
         public async Task<IActionResult> DeletePai(int id)
         {
@@ -81,7 +103,7 @@ namespace ASPCTS.Controllers
             if (pai == null)
                 return NotFound();
 
-            await _paiService.DeletePaiAsync(id);
+            await _paiService.DesativarPaiAsync(id);
             return NoContent();
         }
     }

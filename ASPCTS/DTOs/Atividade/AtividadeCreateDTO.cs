@@ -9,7 +9,7 @@ namespace ASPCTS.DTOs.Atividade
     {
         public string Titulo { get; set; } = string.Empty;
         public string Descricao { get; set; } = string.Empty;
-        public DateTime DataConclusao { get; set; }
+        public int CriancaId { get; set; }
 
     }
 }

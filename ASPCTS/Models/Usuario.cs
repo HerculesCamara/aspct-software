@@ -15,5 +15,6 @@ namespace ASPCTS.Models
         public string Tipo { get; set; } = string.Empty;// Tipo de usuario (Psicologo, Pai, etc.)   
         public string CPF { get; set; } = string.Empty;
         public DateTimeOffset DataNascimento { get; set; } = DateTimeOffset.UtcNow; 
+        public bool Ativo { get; set; } = true;
     }
 }

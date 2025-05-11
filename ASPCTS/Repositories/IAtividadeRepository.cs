@@ -13,6 +13,6 @@ namespace ASPCTS.Repositories
         Task<IEnumerable<Atividade>> GetAtividadeByTituloAsync(string name);
         Task AddAtividadeAsync(Atividade Atividade);
         Task UpdateAtividadeAsync(Atividade Atividade);
-        Task DeleteAtividadeAsync(int id);
+        Task DesativarAtividadeAsync(int id);
     }
 }

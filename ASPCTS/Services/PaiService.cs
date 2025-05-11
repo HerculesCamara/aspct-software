@@ -81,7 +81,7 @@ namespace ASPCTS.Services
             await _paiRepository.UpdatePaiAsync(pai);
         }
         
-        public async Task DeletePaiAsync(int id)
+        public async Task DesativarPaiAsync(int id)
         {
             var pais = await _paiRepository.GetAllPaisAsync();
             var pai = pais.FirstOrDefault(u => u.Id == id);
@@ -90,8 +90,12 @@ namespace ASPCTS.Services
             {
                 throw new Exception("Pai não encontrado.");
             }
+            if (!pai.Ativo)
+            {
+                throw new Exception("Pai já está desativado.");
+            }
 
-            await _paiRepository.DeletePaiAsync(id);
+            await _paiRepository.DesativarPaiAsync(id);
         }
     }
 }

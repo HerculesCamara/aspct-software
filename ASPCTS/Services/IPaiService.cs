@@ -13,6 +13,6 @@ namespace ASPCTS.Services
         Task<Pai?> GetPaiByCPFAsync(string cpf);
         Task AddPaiAsync(Pai pai);
         Task UpdatePaiAsync(Pai pai);
-        Task DeletePaiAsync(int id);
+        Task DesativarPaiAsync(int id);
     }
 }

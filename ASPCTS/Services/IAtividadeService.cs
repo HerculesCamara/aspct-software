@@ -12,6 +12,6 @@ namespace ASPCTS.Services
         Task<Atividade?> GetAtividadeByIdAsync(int id);
         Task AddAtividadeAsync(Atividade Atividade);
         Task UpdateAtividadeAsync(Atividade Atividade);
-        Task DeleteAtividadeAsync(int id);
+        Task DesativarAtividadeAsync(int id);
     }
 }

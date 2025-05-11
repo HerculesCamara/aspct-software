@@ -89,7 +89,7 @@ namespace ASPCTS.Services
             await _psicologoRepository.UpdatePsicologoAsync(psicologo);
         }
 
-        public async Task DeletePsicologoAsync(int id)
+        public async Task DesativarPsicologoAsync(int id)
         {
             var psicologos = await _psicologoRepository.GetAllPsicologosAsync();
             var psicologo = psicologos.FirstOrDefault(u => u.Id == id);
@@ -98,8 +98,12 @@ namespace ASPCTS.Services
             {
                 throw new Exception("Psicologo não encontrado.");
             }
+            if (!psicologo.Ativo)
+            {
+                throw new Exception("Psicologo já está desativado.");
+            }
 
-            await _psicologoRepository.DeletePsicologoAsync(id);
+            await _psicologoRepository.DesativarPsicologoAsync(id);
         }
     }
 }

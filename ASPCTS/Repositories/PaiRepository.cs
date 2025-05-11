@@ -58,12 +58,13 @@ namespace ASPCTS.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeletePaiAsync(int id)
+        public async Task DesativarPaiAsync(int id)
         {
             var pai = await GetPaiByIdAsync(id);
             if (pai != null)
             {
-                _context.Usuarios.Remove(pai);
+                pai.Ativo = false; // Desativa o pai
+                _context.Usuarios.Update(pai);
                 await _context.SaveChangesAsync();
             }
         }

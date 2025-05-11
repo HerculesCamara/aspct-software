@@ -17,5 +17,6 @@ namespace ASPCTS.Models
         // Relacionamento com a criança
         public int CriancaId { get; set; }
         public Crianca? Crianca { get; set; }
+        public bool Ativo { get; set; } = true;
     }
 }

@@ -9,18 +9,18 @@ namespace ASPCTS.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CriancaController : ControllerBase
+    public class criancaController : ControllerBase
     {
         private readonly ICriancaService _criancaService;
         private readonly IMapper _mapper;
 
-        public CriancaController(ICriancaService criancaService, IMapper mapper)
+        public criancaController(ICriancaService criancaService, IMapper mapper)
         {
             _criancaService = criancaService;
             _mapper = mapper;
         }
 
-        [HttpGet("BuscarTodasCriancas")]
+        [HttpGet("buscar-todas-criancas")]
         [ProducesResponseType(typeof(IEnumerable<CriancaDTO>), 200)]
         public async Task<IActionResult> GetAllCriancas()
         {
@@ -29,7 +29,7 @@ namespace ASPCTS.Controllers
             return Ok(criancasDto);
         }
 
-        [HttpGet("BuscarCriancaId/{id}")]
+        [HttpGet("buscar-crianca-por-id/{id}")]
         [ProducesResponseType(typeof(CriancaDTO), 200)]
         public async Task<IActionResult> GetCriancaById(int id)
         {
@@ -41,7 +41,8 @@ namespace ASPCTS.Controllers
             return Ok(criancaDto);
         }
 
-        [HttpPost("AdicionarCrianca")]
+        [HttpPost("adicionar-crianca")]
+        [ProducesResponseType(typeof(CriancaDTO), 400)]
         [ProducesResponseType(typeof(CriancaDTO), 201)]
         public async Task<IActionResult> AddCrianca([FromBody] CriancaCreateDTO novaCriancaDto)
         {
@@ -55,21 +56,35 @@ namespace ASPCTS.Controllers
             return CreatedAtAction(nameof(GetCriancaById), new { id = crianca.Id }, criancaCriada);
         }
 
-        [HttpPut("AtualizarCrianca/{id}")]
+        [HttpPatch("atualizar-crianca/{id}")]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> UpdateCrianca(int id, [FromBody] CriancaUpdateDTO criancaDto)
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> AtualizarCriancaParcial(int id, [FromBody] CriancaUpdateDTO criancaDto)
         {
             var criancaExistente = await _criancaService.GetCriancaByIdAsync(id);
             if (criancaExistente == null)
                 return NotFound("Criança não encontrada.");
 
-            _mapper.Map(criancaDto, criancaExistente);
+            // Atualiza apenas os campos que foram enviados no DTO
+            if (!string.IsNullOrWhiteSpace(criancaDto.Nome))
+                criancaExistente.Nome = criancaDto.Nome;
+
+            if (criancaDto.DataNascimento.HasValue)
+                criancaExistente.DataNascimento = criancaDto.DataNascimento.Value;
+
+            if (criancaDto.PaiId.HasValue)
+                criancaExistente.PaiId = criancaDto.PaiId.Value;
+
+            if (criancaDto.PsicologoId.HasValue)
+                criancaExistente.PsicologoId = criancaDto.PsicologoId.Value;
+
             await _criancaService.UpdateCriancaAsync(criancaExistente);
 
             return NoContent();
         }
 
-        [HttpDelete("DeletarCrianca/{id}")]
+
+        [HttpDelete("desativar-crianca/{id}")]
         [ProducesResponseType(204)]
         public async Task<IActionResult> DeleteCrianca(int id)
         {
@@ -77,7 +92,7 @@ namespace ASPCTS.Controllers
             if (crianca == null)
                 return NotFound();
 
-            await _criancaService.DeleteCriancaAsync(id);
+            await _criancaService.DesativarCriancaAsync(id);
             return NoContent();
         }
     }

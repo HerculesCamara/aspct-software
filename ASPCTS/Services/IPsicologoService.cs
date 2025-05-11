@@ -13,6 +13,6 @@ namespace ASPCTS.Services
         Task<Psicologo?> GetPsicologoByCPFAsync(string cpf);
         Task AddPsicologoAsync(Psicologo psicologo);
         Task UpdatePsicologoAsync(Psicologo psicologo);
-        Task DeletePsicologoAsync(int id);
+        Task DesativarPsicologoAsync(int id);
     }
 }

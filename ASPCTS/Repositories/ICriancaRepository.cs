@@ -14,6 +14,6 @@ namespace ASPCTS.Repositories
         Task<Crianca?> GetCriancaByPaiIdAsync(int idPai);
         Task AddCriancaAsync(Crianca crianca);
         Task UpdateCriancaAsync(Crianca crianca);
-        Task DeleteCriancaAsync(int id);
+        Task DesativarCriancaAsync(int id);
     }
 }

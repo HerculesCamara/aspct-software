@@ -64,12 +64,13 @@ namespace ASPCTS.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeletePsicologoAsync(int id)
+        public async Task DesativarPsicologoAsync(int id)
         {
             var psicologo = await GetPsicologoByIdAsync(id);
             if (psicologo != null)
             {
-                _context.Usuarios.Remove(psicologo);
+                psicologo.Ativo = false; // Desativa o psicólogo
+                _context.Usuarios.Update(psicologo);
                 await _context.SaveChangesAsync();
             }
         }

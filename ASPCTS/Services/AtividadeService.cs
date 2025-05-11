@@ -20,7 +20,24 @@ namespace ASPCTS.Services
 
         public async Task<IEnumerable<Atividade>> GetAllAtividadesAsync()
         {
-            return await _atividadeRepository.GetAllAtividadesAsync();
+            if (_atividadeRepository == null)
+            {
+                throw new InvalidOperationException("O repositório de atividades não foi inicializado.");
+            }
+
+            var atividades = await _atividadeRepository.GetAllAtividadesAsync();
+            var atividadesFiltradas = new List<Atividade>();
+
+            foreach (var atividade in atividades)
+            {
+                var crianca = await _criancaRepository.GetCriancaByIdAsync(atividade.CriancaId);
+                if (crianca != null && crianca.Ativo)
+                {
+                    atividadesFiltradas.Add(atividade);
+                }
+            }
+
+            return atividadesFiltradas;
         }
 
         public async Task<Atividade?> GetAtividadeByIdAsync(int id)
@@ -65,15 +82,11 @@ namespace ASPCTS.Services
 
         public async Task UpdateAtividadeAsync(Atividade atividade)
         {
-            //Permitir que o usuario altera somente o status de conclusão da atividade
-            if (atividade.Concluida == default(bool))
-            {
-                throw new ArgumentException("O status de conclusão deve ser informado.");
-            }
+            
             await _atividadeRepository.UpdateAtividadeAsync(atividade);
         }
 
-        public async Task DeleteAtividadeAsync(int id)
+        public async Task DesativarAtividadeAsync(int id)
         {
             //Verificar se a atividade existe antes de tentar deletá-la
             var atividade = await _atividadeRepository.GetAtividadeByIdAsync(id);
@@ -86,7 +99,7 @@ namespace ASPCTS.Services
             {
                 throw new InvalidOperationException("Atividades concluídas não podem ser deletadas.");
             }
-            await _atividadeRepository.DeleteAtividadeAsync(id);
+            await _atividadeRepository.DesativarAtividadeAsync(id);
         }
     }
 }

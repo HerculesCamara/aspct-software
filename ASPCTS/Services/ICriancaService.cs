@@ -12,6 +12,6 @@ namespace ASPCTS.Services
         Task<Crianca?> GetCriancaByIdAsync(int id);
         Task AddCriancaAsync(Crianca crianca);
         Task UpdateCriancaAsync(Crianca crianca);
-        Task DeleteCriancaAsync(int id);
+        Task DesativarCriancaAsync(int id);
     }
 }

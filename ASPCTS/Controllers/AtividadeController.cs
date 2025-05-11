@@ -11,18 +11,18 @@ namespace ASPCTS.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AtividadeController : ControllerBase
+    public class atividadeController : ControllerBase
     {
         private readonly IAtividadeService _atividadeService;
         private readonly IMapper _mapper;
 
-        public AtividadeController(IAtividadeService atividadeService, IMapper mapper)
+        public atividadeController(IAtividadeService atividadeService, IMapper mapper)
         {
             _atividadeService = atividadeService;
             _mapper = mapper;
         }
 
-        [HttpGet("BuscarTodasAtividades")]
+        [HttpGet("buscar-atividades")]
         [ProducesResponseType(typeof(IEnumerable<AtividadeDTO>), 200)]
         public async Task<IActionResult> GetAllAtividades()
         {
@@ -31,7 +31,7 @@ namespace ASPCTS.Controllers
             return Ok(atividadesDto);
         }
 
-        [HttpGet("BuscarAtividadeId/{id}")]
+        [HttpGet("buscar-atividade-id/{id}")]
         [ProducesResponseType(typeof(AtividadeDTO), 200)]
         public async Task<IActionResult> GetAtividadeById(int id)
         {
@@ -44,7 +44,8 @@ namespace ASPCTS.Controllers
             return Ok(atividadeDto);
         }
 
-        [HttpPost("AdicionarAtividade")]
+        [HttpPost("adicionar-atividade")]
+        [ProducesResponseType(typeof(AtividadeDTO), 400)]
         [ProducesResponseType(typeof(AtividadeDTO), 201)]
         public async Task<IActionResult> AddAtividade([FromBody] AtividadeCreateDTO atividadeDto)
         {
@@ -59,28 +60,10 @@ namespace ASPCTS.Controllers
             return CreatedAtAction(nameof(GetAtividadeById), new { id = atividade.Id }, atividadeResultDto);
         }
 
-        [HttpPut("AtualizarAtividade/{id}")]
-        public async Task<IActionResult> UpdateAtividade(int id, [FromBody] AtividadeUpdateDTO atividadeDto)
-        {
-            if (atividadeDto == null)
-            {
-                return BadRequest("Dados inválidos para atualização.");
-            }
-
-            var atividadeExistente = await _atividadeService.GetAtividadeByIdAsync(id);
-            if (atividadeExistente == null)
-            {
-                return NotFound("Atividade não encontrada.");
-            }
-
-            _mapper.Map(atividadeDto, atividadeExistente);
-            await _atividadeService.UpdateAtividadeAsync(atividadeExistente);
-            return NoContent();
-        }
-
-        [HttpDelete("DeletarAtividade/{id}")]
+        [HttpPatch("atualizar-atividade/{id}")]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> DeleteAtividade(int id)
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> AtualizarAtividadeParcial(int id, [FromBody] AtividadeUpdateDTO dto)
         {
             var atividade = await _atividadeService.GetAtividadeByIdAsync(id);
             if (atividade == null)
@@ -88,8 +71,49 @@ namespace ASPCTS.Controllers
                 return NotFound();
             }
 
-            await _atividadeService.DeleteAtividadeAsync(id);
+            // Atualiza apenas os campos fornecidos
+            if (!string.IsNullOrEmpty(dto.Titulo))
+                atividade.Titulo = dto.Titulo;
+
+            if (!string.IsNullOrEmpty(dto.Descricao))
+                atividade.Descricao = dto.Descricao;
+
+            if (dto.Concluida.HasValue)
+            {
+                atividade.Concluida = dto.Concluida.Value;
+
+                // Se a atividade for marcada como concluída, define a data de conclusão como a data atual
+                if (atividade.Concluida.Value)
+                {
+                    atividade.DataConclusao = DateTime.UtcNow;
+                }
+            }
+
+            if (dto.DataConclusao.HasValue)
+                atividade.DataConclusao = dto.DataConclusao;
+
+
+            // Chama o serviço para atualizar a atividade no repositório
+            await _atividadeService.UpdateAtividadeAsync(atividade);
+
             return NoContent();
         }
+
+
+        [HttpDelete("desativar-atividade/{id}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> DesativarAtividade(int id)
+        {
+            var atividade = await _atividadeService.GetAtividadeByIdAsync(id);
+            if (atividade == null)
+            {
+                return NotFound();
+            }
+
+            await _atividadeService.DesativarAtividadeAsync(id);
+            return NoContent();
+        }
+
     }
 }

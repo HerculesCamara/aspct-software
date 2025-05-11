@@ -11,6 +11,7 @@ namespace ASPCTS.Models
         public string Nome { get; set; } = string.Empty;
         public int Idade => CalcularIdade();
         public DateTimeOffset DataNascimento { get; set; } = DateTimeOffset.UtcNow;
+        public bool Ativo { get; set; } = true;
 
         // Relacionamento com Pai
         public int PaiId { get; set; }
@@ -22,6 +23,7 @@ namespace ASPCTS.Models
 
         // Lista de atividades associadas
         public ICollection<Atividade> Atividades { get; set; } = new List<Atividade>();
+        
 
         internal object Select(Func<object, object> value)
         {

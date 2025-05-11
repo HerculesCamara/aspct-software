@@ -15,6 +15,6 @@ namespace ASPCTS.Repositories
         Task<Psicologo?> GetPsicologoByCrpAsync(string crp);
         Task AddPsicologoAsync(Psicologo psicologo);
         Task UpdatePsicologoAsync(Psicologo psicologo);
-        Task DeletePsicologoAsync(int id);
+        Task DesativarPsicologoAsync(int id);
     }
 }

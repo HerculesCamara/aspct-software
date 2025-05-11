@@ -49,14 +49,16 @@ namespace ASPCTS.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteAtividadeAsync(int id)
+        public async Task DesativarAtividadeAsync(int id)
         {
             var atividade = await GetAtividadeByIdAsync(id);
             if (atividade != null)
             {
-                _context.Atividades.Remove(atividade);
+                atividade.Ativo = false; 
+                _context.Atividades.Update(atividade);
                 await _context.SaveChangesAsync();
             }
         }
+
     }
 }
