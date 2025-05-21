@@ -14,6 +14,12 @@ namespace ASPCTS.Models
         public string Phone { get; set; } = string.Empty;
         public string Tipo { get; set; } = string.Empty;// Tipo de usuario (Psicologo, Pai, etc.)   
         public string CPF { get; set; } = string.Empty;
+        public enum Genero
+        {
+            Masculino,
+            Feminino
+        }
+        public Genero Sexo { get; set; }
         public DateTimeOffset DataNascimento { get; set; } = DateTimeOffset.UtcNow; 
         public bool Ativo { get; set; } = true;
     }

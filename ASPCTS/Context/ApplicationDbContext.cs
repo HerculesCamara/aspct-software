@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Linq;
 using System.Threading.Tasks;
 using ASPCTS.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ASPCTS.Context
 {
@@ -15,23 +17,29 @@ namespace ASPCTS.Context
         public DbSet<Models.Atividade> Atividades { get; set; } = null!;
         public DbSet<Models.Crianca> Criancas { get; set; } = null!;
         public DbSet<Models.Usuario> Usuarios { get; set; } = null!;
+        public DbSet<Relatorio> Relatorios { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {   
+        {
             // Configuração da tabela de usuários
             modelBuilder.Entity<Usuario>()
                 .ToTable("Usuarios")
                 .HasDiscriminator<string>("Tipo")
-                .HasValue<Pai>("Pai")
+                .HasValue<Responsavel>("Responsavel")
                 .HasValue<Psicologo>("Psicologo");
 
             //Relacionamento: Crianca -> Pai (Usuario)
             modelBuilder.Entity<Crianca>()
                 .HasOne(c => c.Pai)
-                .WithMany(p => p.Criancas)
+                .WithMany()
                 .HasForeignKey(c => c.PaiId)
-                .OnDelete(DeleteBehavior.Restrict); // Impede a exclusão em cascata do pai se houver filhos associados
-
+                .OnDelete(DeleteBehavior.Restrict);
+            //Relacionamento: Crianca -> Mae (Usuario)
+            modelBuilder.Entity<Crianca>()
+                .HasOne(c => c.Mae)
+                .WithMany()
+                .HasForeignKey(c => c.MaeId)
+                .OnDelete(DeleteBehavior.Restrict);
             //Relacionamento: Crianca -> Psicologo (Usuario)
             modelBuilder.Entity<Crianca>()
                 .HasOne(c => c.Psicologo)
@@ -47,6 +55,14 @@ namespace ASPCTS.Context
                 .OnDelete(DeleteBehavior.Restrict); // Impede a exclusão em cascata da criança se houver atividades associadas
 
             base.OnModelCreating(modelBuilder);
+
+            var converter = new ValueConverter<List<string>, string>(
+            v => JsonSerializer.Serialize(v, default(JsonSerializerOptions)),
+            v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions?)null) ?? new List<string>());
+
+            modelBuilder.Entity<Relatorio>()
+                .Property(r => r.MarcosAlcancados)
+                .HasConversion(converter);
         }
     }
 }

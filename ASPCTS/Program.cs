@@ -15,7 +15,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 //Repostories
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
-builder.Services.AddScoped<IPaiRepository, PaiRepository>();
+builder.Services.AddScoped<IResponsavelRepository, ResponsavelRepository>();
 builder.Services.AddScoped<IPsicologoRepository, PsicologoRepository>();
 builder.Services.AddScoped<ICriancaRepository, CriancaRepository>();
 builder.Services.AddScoped<IAtividadeRepository, AtividadeRepository>();
@@ -31,7 +31,7 @@ builder.Services.AddControllers()
     }); ;
 builder.Services.AddScoped<IAtividadeService, AtividadeService>();
 builder.Services.AddScoped<ICriancaService, CriancaService>();
-builder.Services.AddScoped<IPaiService, PaiService>();
+builder.Services.AddScoped<IResponsavelService, ResponsavelService>();
 builder.Services.AddScoped<IPsicologoService, PsicologoService>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

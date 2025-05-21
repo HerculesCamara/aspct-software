@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ASPCTS.DTOs.Atividade;
 using ASPCTS.DTOs.Crianca;
-using ASPCTS.DTOs.Pai;
+using ASPCTS.DTOs.Responsavel;
 using ASPCTS.DTOs.Psicologo;
 using ASPCTS.Models;
 using AutoMapper;
@@ -16,9 +16,9 @@ namespace ASPCTS.Mappings
         public MappingProfile()
         {
             // Pai
-            CreateMap<Pai, PaiDTO>().ReverseMap();
-            CreateMap<Pai, PaiCreateDTO>().ReverseMap();
-            CreateMap<Pai, PaiUpdateDTO>().ReverseMap();
+            CreateMap<Responsavel, ResponsavelDTO>().ReverseMap();
+            CreateMap<Responsavel, ResponsavelCreateDTO>().ReverseMap();
+            CreateMap<Responsavel, ResponsavelUpdateDTO>().ReverseMap();
 
             // Psicólogo
             CreateMap<Psicologo, PsicologoDTO>().ReverseMap();

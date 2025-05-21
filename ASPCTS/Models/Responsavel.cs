@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace ASPCTS.Models
 {
-    public class Pai : Usuario
+    public class Responsavel : Usuario
     {
         // Relacionamento com as crianças
         public ICollection<Crianca> Criancas { get; set; } = new List<Crianca>();

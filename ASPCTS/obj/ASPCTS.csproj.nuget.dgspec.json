@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\gusta\\Desktop\\API\\ASPCTS\\ASPCTS.csproj": {}
+    "C:\\Users\\gustavo.moreira\\Desktop\\TCC\\aspct-software\\aspcts\\ASPCTS.csproj": {}
   },
   "projects": {
-    "C:\\Users\\gusta\\Desktop\\API\\ASPCTS\\ASPCTS.csproj": {
+    "C:\\Users\\gustavo.moreira\\Desktop\\TCC\\aspct-software\\aspcts\\ASPCTS.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\gusta\\Desktop\\API\\ASPCTS\\ASPCTS.csproj",
+        "projectUniqueName": "C:\\Users\\gustavo.moreira\\Desktop\\TCC\\aspct-software\\aspcts\\ASPCTS.csproj",
         "projectName": "ASPCTS",
-        "projectPath": "C:\\Users\\gusta\\Desktop\\API\\ASPCTS\\ASPCTS.csproj",
-        "packagesPath": "C:\\Users\\gusta\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\gusta\\Desktop\\API\\ASPCTS\\obj\\",
+        "projectPath": "C:\\Users\\gustavo.moreira\\Desktop\\TCC\\aspct-software\\aspcts\\ASPCTS.csproj",
+        "packagesPath": "C:\\Users\\gustavo.moreira\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\gustavo.moreira\\Desktop\\TCC\\aspct-software\\aspcts\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\gusta\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\gustavo.moreira\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -51,21 +51,25 @@
               "target": "Package",
               "version": "[9.0.4, )"
             },
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[9.0.5, )"
+            },
             "Microsoft.EntityFrameworkCore.Design": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
               "target": "Package",
-              "version": "[9.0.4, )"
+              "version": "[9.0.5, )"
             },
             "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
-              "version": "[9.0.4, )"
+              "version": "[9.0.5, )"
             },
             "Microsoft.EntityFrameworkCore.Tools": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
               "target": "Package",
-              "version": "[9.0.4, )"
+              "version": "[9.0.5, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
@@ -91,7 +95,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.404/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.408/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

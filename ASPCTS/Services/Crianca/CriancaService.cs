@@ -10,10 +10,11 @@ namespace ASPCTS.Services
     public class CriancaService : ICriancaService
     {
         private readonly ICriancaRepository _criancaRepository;
-
-        public CriancaService(ICriancaRepository criancaRepository)
+        private readonly IResponsavelRepository _responsavelRepository;
+        public CriancaService(ICriancaRepository criancaRepository, IResponsavelRepository responsavelRepository)
         {
             _criancaRepository = criancaRepository;
+            _responsavelRepository = responsavelRepository;
         }
 
         public async Task<IEnumerable<Crianca>> GetAllCriancasAsync()
@@ -38,23 +39,47 @@ namespace ASPCTS.Services
 
         public async Task AddCriancaAsync(Crianca crianca)
         {
-            var criancas = await _criancaRepository.GetAllCriancasAsync();
-
-
-
-            //Mensagens de erro para os campos obrigatorios
             var mensagensErro = new List<string>();
 
             if (string.IsNullOrWhiteSpace(crianca.Nome))
                 mensagensErro.Add("O campo 'Nome' é obrigatório.");
-            if (string.IsNullOrWhiteSpace(crianca.Idade.ToString()))
-                mensagensErro.Add("O campo 'Idade' é obrigatório.");
+
+            bool temPaiValido = false;
+            bool temMaeValida = false;
+
+            // Verifica Pai (se informado)
+            if (crianca.PaiId != 0)
+            {
+                var pai = await _responsavelRepository.GetResponsavelByIdAsync(crianca.PaiId);
+                if (pai == null)
+                    mensagensErro.Add("Pai não encontrado.");
+                else if (pai.Sexo != Usuario.Genero.Masculino)
+                    mensagensErro.Add("O usuário selecionado como pai não é do sexo masculino.");
+                else
+                    temPaiValido = true;
+            }
+
+            // Verifica Mãe (se informado)
+            if (crianca.MaeId != 0)
+            {
+                var mae = await _responsavelRepository.GetResponsavelByIdAsync(crianca.MaeId);
+                if (mae == null)
+                    mensagensErro.Add("Mãe não encontrada.");
+                else if (mae.Sexo != Usuario.Genero.Feminino)
+                    mensagensErro.Add("O usuário selecionado como mãe não é do sexo feminino.");
+                else
+                    temMaeValida = true;
+            }
+
+            if (!temPaiValido && !temMaeValida)
+                mensagensErro.Add("A criança deve possuir ao menos um responsável válido (pai ou mãe).");
 
             if (mensagensErro.Any())
-                throw new Exception(string.Join(", ", mensagensErro));
+                throw new Exception(string.Join(" ", mensagensErro));
 
             await _criancaRepository.AddCriancaAsync(crianca);
         }
+
 
         public async Task UpdateCriancaAsync(Crianca crianca)
         {
@@ -70,7 +95,7 @@ namespace ASPCTS.Services
 
             await _criancaRepository.UpdateCriancaAsync(crianca);
         }
-        
+
         public async Task DesativarCriancaAsync(int id)
         {
             var criancas = await _criancaRepository.GetAllCriancasAsync();

@@ -10,6 +10,7 @@ namespace ASPCTS.DTOs.Crianca
         public string Nome { get; set; } = string.Empty;
         public DateTime DataNascimento { get; set; }
         public int PaiId { get; set; }
+        public int MaeId { get; set; }
         public int? PsicologoId { get; set; }
     }
 }

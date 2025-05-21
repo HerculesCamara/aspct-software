@@ -15,7 +15,10 @@ namespace ASPCTS.Models
 
         // Relacionamento com Pai
         public int PaiId { get; set; }
-        public virtual Pai? Pai { get; set; }
+        public virtual Responsavel? Pai { get; set; }
+        // Relacionamento com Mãe
+        public int MaeId { get; set; }
+        public virtual Responsavel? Mae { get; set; }
 
         // Relacionamento com Psicólogo (opcional)
         public int PsicologoId { get; set; }
