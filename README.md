@@ -1,11 +1,11 @@
 # API para Gestão de Atividades para Crianças
 
-<<<<<<< HEAD
-Este projeto é uma API REST desenvolvida com .NET e Entity Framework Core, utilizando SQL Server Express como banco de dados. A aplicação tem como objetivo gerenciar atividades de crianças, seus pais e psicólogos.
+
+Este projeto é uma API REST desenvolvida com .NET e Entity Framework Core, utilizando SQL Server Express como banco de dados. A aplicação tem como objetivo gerenciar atividades de crianças neurodivergentes, seus pais e psicólogos.
 =======
 Este README fornece informações sobre a API desenvolvida em .NET com Entity Framework Core e SQL Server para gerenciar atividades de crianças, pais e psicólogos.
 Repositório do frontend: https://github.com/HerculesCamara/aspct-frontend
->>>>>>> e57bfa5dc32097e21c2918b05bf35a286d3e52da
+
 
 ---
 
