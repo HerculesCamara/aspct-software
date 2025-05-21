@@ -1,6 +1,11 @@
 # API para Gestão de Atividades para Crianças
 
+<<<<<<< HEAD
 Este projeto é uma API REST desenvolvida com .NET e Entity Framework Core, utilizando SQL Server Express como banco de dados. A aplicação tem como objetivo gerenciar atividades de crianças, seus pais e psicólogos.
+=======
+Este README fornece informações sobre a API desenvolvida em .NET com Entity Framework Core e SQL Server para gerenciar atividades de crianças, pais e psicólogos.
+Repositório do frontend: https://github.com/HerculesCamara/aspct-frontend
+>>>>>>> e57bfa5dc32097e21c2918b05bf35a286d3e52da
 
 ---
 
@@ -182,4 +187,44 @@ https://localhost:5001/
 
 Você pode usar o Postman para testar cada uma das rotas listadas acima. Lembre-se de que as rotas usam os métodos corretos (GET, POST, PATCH, DELETE).
 
+<<<<<<< HEAD
 ---
+=======
+    Certifique-se de que `"ConexaoPadrao"` corresponda ao nome da chave que você usou na seção `ConnectionStrings` do seu `appsettings.json`. `Configuration` (ou `builder.Configuration`) fornece acesso às configurações do seu aplicativo, incluindo as strings de conexão.
+
+Com esses passos, seu projeto .NET estará configurado para utilizar o Entity Framework Core com o SQL Server, utilizando a string de conexão definida no seu arquivo `appsettings.json`. O próximo passo seria criar suas migrações para gerar o schema do banco de dados com base nos seus modelos.
+
+### Como Executar a Aplicação
+
+1.  **Pré-requisitos:**
+    * .NET SDK instalado.
+    * SQL Server instalado (local ou remoto).
+
+2.  **Configurar a String de Conexão:**
+    * Abra o arquivo `appsettings.json` (ou `appsettings.Development.json` para ambiente de desenvolvimento).
+    * Localize a seção `ConnectionStrings` e configure a string de conexão para o seu servidor SQL Server conforme explicado na seção anterior. Certifique-se de que o nome do banco de dados (`Database=NOME_DO_SEU_BANCO`) esteja correto.
+
+3.  **Executar Migrações:**
+    * Abra o terminal na pasta raiz do projeto (onde o arquivo `.csproj` está localizado).
+    * Execute os seguintes comandos para criar o banco de dados e aplicar as migrações:
+        ```bash
+        dotnet ef database update
+        ```
+        Certifique-se de ter as ferramentas do EF Core instaladas (`Microsoft.EntityFrameworkCore.Tools`). Se você estiver usando o Visual Studio, pode usar o **Console do Gerenciador de Pacotes** (Ferramentas -> NuGet Package Manager -> Package Manager Console) e executar o comando `Update-Database`.
+
+4.  **Executar a Aplicação:**
+    * No mesmo terminal, execute o seguinte comando:
+        ```bash
+        dotnet run
+        ```
+    * A API estará disponível em uma URL como `http://localhost:[porta]`, onde `[porta]` é especificada na configuração (geralmente 5000 ou 5001).
+
+### Próximos Passos
+
+* Implementação de autenticação e autorização para proteger os endpoints da API.
+* Adição de documentação da API utilizando Swagger/OpenAPI.
+* Implementação de testes unitários e de integração.
+* Melhorias na validação dos dados de entrada.
+* Implementação de paginação e filtragem para as listagens de recursos.
+* Adição de tratamento de erros mais detalhado
+>>>>>>> e57bfa5dc32097e21c2918b05bf35a286d3e52da
