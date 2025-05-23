@@ -6,6 +6,8 @@ using ASPCTS.Models;
 using ASPCTS.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace ASPCTS.Controllers
 {
@@ -14,45 +16,59 @@ namespace ASPCTS.Controllers
     public class atividadeController : ControllerBase
     {
         private readonly IAtividadeService _atividadeService;
+        private readonly ICriancaService _criancaService;
         private readonly IMapper _mapper;
 
-        public atividadeController(IAtividadeService atividadeService, IMapper mapper)
+        public atividadeController(IAtividadeService atividadeService, ICriancaService criancaService, IMapper mapper)
         {
             _atividadeService = atividadeService;
+            _criancaService = criancaService;
             _mapper = mapper;
         }
 
         [HttpGet("buscar-atividades")]
+        [Authorize(Roles = "Responsavel,Psicologo")]
         [ProducesResponseType(typeof(IEnumerable<AtividadeDTO>), 200)]
         public async Task<IActionResult> GetAllAtividades()
         {
             var atividades = await _atividadeService.GetAllAtividadesAsync();
-            var atividadesDto = _mapper.Map<IEnumerable<AtividadeDTO>>(atividades);
+
+            var atividadesFiltradas = new List<Atividade>();
+            foreach (var atividade in atividades)
+            {
+                if (await _criancaService.UsuarioTemAcessoACriancaAsync(atividade.CriancaId, User))
+                {
+                    atividadesFiltradas.Add(atividade);
+                }
+            }
+
+            var atividadesDto = _mapper.Map<IEnumerable<AtividadeDTO>>(atividadesFiltradas);
             return Ok(atividadesDto);
         }
 
         [HttpGet("buscar-atividade-id/{id}")]
+        [Authorize(Roles = "Responsavel,Psicologo")]
         [ProducesResponseType(typeof(AtividadeDTO), 200)]
         public async Task<IActionResult> GetAtividadeById(int id)
         {
             var atividade = await _atividadeService.GetAtividadeByIdAsync(id);
-            if (atividade == null)
-            {
-                return NotFound();
-            }
+            if (atividade == null) return NotFound();
+
+            if (!await _criancaService.UsuarioTemAcessoACriancaAsync(atividade.CriancaId, User))
+                return Forbid();
+
             var atividadeDto = _mapper.Map<AtividadeDTO>(atividade);
             return Ok(atividadeDto);
         }
 
         [HttpPost("adicionar-atividade")]
+        [Authorize(Roles = "Psicologo")]
         [ProducesResponseType(typeof(AtividadeDTO), 400)]
         [ProducesResponseType(typeof(AtividadeDTO), 201)]
         public async Task<IActionResult> AddAtividade([FromBody] AtividadeCreateDTO atividadeDto)
         {
             if (atividadeDto == null)
-            {
                 return BadRequest("Atividade não pode ser nula.");
-            }
 
             var atividade = _mapper.Map<Atividade>(atividadeDto);
             await _atividadeService.AddAtividadeAsync(atividade);
@@ -61,59 +77,60 @@ namespace ASPCTS.Controllers
         }
 
         [HttpPatch("atualizar-atividade/{id}")]
+        [Authorize(Roles = "Responsavel,Psicologo")]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> AtualizarAtividadeParcial(int id, [FromBody] AtividadeUpdateDTO dto)
         {
             var atividade = await _atividadeService.GetAtividadeByIdAsync(id);
-            if (atividade == null)
+            if (atividade == null) return NotFound();
+
+            if (!await _criancaService.UsuarioTemAcessoACriancaAsync(atividade.CriancaId, User))
+                return Forbid();
+
+            var role = User.FindFirst(ClaimTypes.Role)?.Value;
+
+            if (role == "Responsavel")
             {
-                return NotFound();
+                if (dto.Concluida.HasValue)
+                    atividade.Ativo = dto.Concluida.Value;
             }
-
-            // Atualiza apenas os campos fornecidos
-            if (!string.IsNullOrEmpty(dto.Titulo))
-                atividade.Titulo = dto.Titulo;
-
-            if (!string.IsNullOrEmpty(dto.Descricao))
-                atividade.Descricao = dto.Descricao;
-
-            if (dto.Concluida.HasValue)
+            else if (role == "Psicologo")
             {
-                atividade.Concluida = dto.Concluida.Value;
-
-                // Se a atividade for marcada como concluída, define a data de conclusão como a data atual
-                if (atividade.Concluida.Value)
+                if (!string.IsNullOrEmpty(dto.Titulo))
+                    atividade.Titulo = dto.Titulo;
+                if (!string.IsNullOrEmpty(dto.Descricao))
+                    atividade.Descricao = dto.Descricao;
+                if (dto.Concluida.HasValue)
                 {
-                    atividade.DataConclusao = DateTime.UtcNow;
+                    atividade.Concluida = dto.Concluida.Value;
+                    if (atividade.Concluida.Value)
+                        atividade.DataConclusao = DateTime.UtcNow;
                 }
+                if (dto.DataConclusao.HasValue)
+                    atividade.DataConclusao = dto.DataConclusao;
+                if (dto.Concluida.HasValue)
+                    atividade.Ativo = dto.Concluida.Value;
             }
 
-            if (dto.DataConclusao.HasValue)
-                atividade.DataConclusao = dto.DataConclusao;
-
-
-            // Chama o serviço para atualizar a atividade no repositório
             await _atividadeService.UpdateAtividadeAsync(atividade);
-
             return NoContent();
         }
 
-
         [HttpDelete("desativar-atividade/{id}")]
+        [Authorize(Roles = "Psicologo")]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> DesativarAtividade(int id)
         {
             var atividade = await _atividadeService.GetAtividadeByIdAsync(id);
-            if (atividade == null)
-            {
-                return NotFound();
-            }
+            if (atividade == null) return NotFound();
+
+            if (!await _criancaService.UsuarioTemAcessoACriancaAsync(atividade.CriancaId, User))
+                return Forbid();
 
             await _atividadeService.DesativarAtividadeAsync(id);
             return NoContent();
         }
-
     }
 }

@@ -37,10 +37,13 @@ namespace ASPCTS.Services
         {
             return await _responsavelRepository.GetResponsavelByIdAsync(id);
         }
-        public async Task<Responsavel?> GetResponsavelByCPFAsync(string cpf)
+        public async Task<Responsavel?> GetResponsavelByEmailAsync(string email)
         {
-            var responsaveis = await _responsavelRepository.GetAllResponsaveisAsync();
-            return responsaveis.FirstOrDefault(u => u.CPF == cpf);
+            return await _responsavelRepository.GetResponsavelByEmailAsync(email);
+        }
+        public async Task<IEnumerable<Responsavel>> GetResponsaveisByCPFAsync(string cpf)
+        {
+            return await _responsavelRepository.GetResponsaveisByCPFAsync(cpf);
         }
         public async Task AddResponsavelAsync(Responsavel responsavel)
         {
@@ -65,6 +68,23 @@ namespace ASPCTS.Services
                 mensagensErro.Add("O campo 'Nome' é obrigatório.");
             if (string.IsNullOrWhiteSpace(responsavel.CPF))
                 mensagensErro.Add("O campo 'CPF' é obrigatório.");
+            if (string.IsNullOrWhiteSpace(responsavel.Email))
+                mensagensErro.Add("O campo 'Email' é obrigatório.");
+            if (string.IsNullOrWhiteSpace(responsavel.Password))
+                mensagensErro.Add("O campo 'Senha' é obrigatório.");
+            if (string.IsNullOrWhiteSpace(responsavel.Phone))
+                mensagensErro.Add("O campo 'Telefone' é obrigatório.");
+            if (responsavel.DataNascimento == DateTimeOffset.MinValue)
+                mensagensErro.Add("O campo 'Data de Nascimento' é obrigatório.");
+            if (responsavel.PsicologoId == 0)
+                mensagensErro.Add("O campo 'Psicologo' é obrigatório.");
+
+            responsavel.SetPassword(responsavel.Password);
+
+            if (mensagensErro.Count > 0)
+            {
+                throw new Exception(string.Join(" ", mensagensErro));
+            }
 
             await _responsavelRepository.AddResponsavelAsync(responsavel);
         }
@@ -82,6 +102,11 @@ namespace ASPCTS.Services
             if (existing == null)
             {
                 throw new Exception("Responsavel não encontrado.");
+            }
+            //Criptografia de senha caso ela seja alterada
+            if (!string.IsNullOrWhiteSpace(responsavel.Password))
+            {
+                responsavel.SetPassword(responsavel.Password);
             }
 
             await _responsavelRepository.UpdateResponsavelAsync(responsavel);

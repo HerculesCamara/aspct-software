@@ -10,9 +10,8 @@ namespace ASPCTS.Repositories
     {
         Task<IEnumerable<Psicologo>> GetAllPsicologosAsync();
         Task<Psicologo?> GetPsicologoByIdAsync(int id);
-        Task<IEnumerable<Psicologo>> GetPsicologoByNameAsync(string name);
-        Task<Psicologo?> GetPsicologoByCPFAsync(string cpf);
-        Task<Psicologo?> GetPsicologoByCrpAsync(string crp);
+        Task<Psicologo?> GetPsicologoByEmailAsync(string email);
+        Task<IEnumerable<Psicologo>> GetPsicologosByCPFAsync(string cpf);
         Task AddPsicologoAsync(Psicologo psicologo);
         Task UpdatePsicologoAsync(Psicologo psicologo);
         Task DesativarPsicologoAsync(int id);

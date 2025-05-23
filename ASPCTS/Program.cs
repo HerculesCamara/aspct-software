@@ -39,15 +39,30 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(
     options =>
 {
-    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "ASPCTS API", Version = "v1" });
+
+    // Configura o esquema de segurança para JWT
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Version = "v1",
-        Title = "API para ASPCTS",
-        Description = "API para acompanhamento de criancas com desordem do espectro autista",
-        Contact = new OpenApiContact
+        Description = "Insira o token JWT desta forma: Bearer {seu_token}",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
         {
-            Name = "Gustavo Maia",
-            Email = "gustavogomesmaia@gmail.com"
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
         }
     });
 }
@@ -76,7 +91,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "ASPCTS API v1");
-        c.RoutePrefix = string.Empty; // Exibe Swagger na raiz (opcional)
+        c.RoutePrefix = string.Empty; // Exibe Swagger na raiz
     });
 }
 

@@ -8,6 +8,7 @@ namespace ASPCTS.Repositories
 {
     public interface IRelatorioRepository
     {
+        IQueryable<Relatorio> GetQueryableRelatorios();
         Task<IEnumerable<Relatorio>> GetAllRelatorioAsync();
         Task<Relatorio?> GetRelatorioByIdAsync(int id);
         Task<IEnumerable<Relatorio>> GetRelatorioByCriancaIdAsync(int criancaId);

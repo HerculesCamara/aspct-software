@@ -1,28 +1,35 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using ASPCTS.Context;
 using ASPCTS.DTOs.Psicologo;
 using ASPCTS.Models;
 using ASPCTS.Services;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ASPCTS.Controllers
 {
-    [Microsoft.AspNetCore.Mvc.Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class psicologoController : ControllerBase
     {
         private readonly IPsicologoService _psicologoService;
         private readonly IMapper _mapper;
-        public psicologoController(IPsicologoService psicologoService, IMapper mapper)
+        private readonly ApplicationDbContext _context;
+
+        public psicologoController(IPsicologoService psicologoService, IMapper mapper, ApplicationDbContext context)
         {
             _psicologoService = psicologoService;
             _mapper = mapper;
+            _context = context;
         }
 
-        //GET: api/psicologo
+        [Authorize(Roles = "Psicologo")]
         [HttpGet("buscar-todos-psicologos")]
         [ProducesResponseType(typeof(IEnumerable<PsicologoDTO>), 200)]
         public async Task<IActionResult> GetAllPsicologos()
@@ -31,23 +38,30 @@ namespace ASPCTS.Controllers
             return Ok(psicologosDto);
         }
 
-        //GET: api/psicologo/{id}
+        [Authorize(Roles = "Psicologo")]
         [HttpGet("buscar-psicologo-por-id/{id}")]
         [ProducesResponseType(typeof(PsicologoDTO), 200)]
+        [ProducesResponseType(403)]
+        [ProducesResponseType(404)]
         public async Task<IActionResult> GetPsicologoById(int id)
         {
+            var usuarioId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+            if (usuarioId != id) return Forbid();
+
             var psicologo = await _psicologoService.GetPsicologoByIdAsync(id);
             if (psicologo == null)
             {
                 return NotFound();
             }
+
             var psicologoDto = _mapper.Map<PsicologoDTO>(psicologo);
             return Ok(psicologoDto);
         }
 
-        //POST: api/psicologo
         [HttpPost("adicionar-psicologo")]
-        [ProducesResponseType(typeof(Psicologo), 201)]
+        [ProducesResponseType(typeof(PsicologoDTO), 201)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(409)]
         public async Task<IActionResult> AddPsicologo(PsicologoCreateDTO novoPsicologoDto)
         {
             if (novoPsicologoDto == null)
@@ -55,26 +69,31 @@ namespace ASPCTS.Controllers
                 return BadRequest("Dados inválidos.");
             }
 
-            var psicologo = _mapper.Map<Psicologo>(novoPsicologoDto);
-            psicologo.Tipo = "Psicologo";
-
-            var existingPsicologo = await _psicologoService.GetPsicologoByCPFAsync(psicologo.CPF);
+            var existingPsicologo = await _psicologoService.GetPsicologosByCPFAsync(novoPsicologoDto.CPF);
             if (existingPsicologo != null)
             {
                 return Conflict("Já existe um psicólogo cadastrado com esse CPF.");
             }
 
+            var psicologo = _mapper.Map<Psicologo>(novoPsicologoDto);
+            psicologo.Tipo = "Psicologo";
+
             await _psicologoService.AddPsicologoAsync(psicologo);
             var novoPsicologo = _mapper.Map<PsicologoDTO>(psicologo);
+
             return CreatedAtAction(nameof(GetPsicologoById), new { id = psicologo.Id }, novoPsicologo);
         }
 
-        // PUT: api/psicologo/{id}
+        [Authorize(Roles = "Psicologo")]
         [HttpPatch("atualizar-psicologo/{id}")]
         [ProducesResponseType(204)]
+        [ProducesResponseType(403)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> UpdatePsicologoParcial(int id, [FromBody] PsicologoUpdateDTO psicologoDto)
         {
+            var usuarioId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+            if (usuarioId != id) return Forbid();
+
             var psicologoExistente = await _psicologoService.GetPsicologoByIdAsync(id);
             if (psicologoExistente == null)
             {
@@ -108,20 +127,37 @@ namespace ASPCTS.Controllers
             return NoContent();
         }
 
-
-
-        //DELETE: api/psicologo/{id}
+        [Authorize(Roles = "Psicologo")]
         [HttpDelete("desativar-psicologo/{id}")]
-        [ProducesResponseType(typeof(Psicologo), 204)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(403)]
+        [ProducesResponseType(404)]
         public async Task<IActionResult> DeletePsicologo(int id)
         {
+            var usuarioId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+            if (usuarioId != id) return Forbid();
+
             var psicologo = await _psicologoService.GetPsicologoByIdAsync(id);
             if (psicologo == null)
             {
                 return NotFound();
             }
+
             await _psicologoService.DesativarPsicologoAsync(id);
             return NoContent();
+        }
+
+        // Exemplo de endpoint adicional com filtro baseado no psicologo logado
+        [Authorize(Roles = "Psicologo")]
+        [HttpGet("minhas-criancas")]
+        public async Task<IActionResult> GetMinhasCriancas()
+        {
+            var usuarioId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+            var criancas = await _context.Criancas
+                .Where(c => c.PsicologoId == usuarioId)
+                .ToListAsync();
+
+            return Ok(criancas);
         }
     }
 }

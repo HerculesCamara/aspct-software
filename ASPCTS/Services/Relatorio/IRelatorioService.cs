@@ -8,6 +8,7 @@ namespace ASPCTS.Services
 {
     public interface IRelatorioService
     {
+        IQueryable<Relatorio> GetQueryableRelatorios();
         Task<IEnumerable<Relatorio>> GetAllRelatorioAsync();
         Task<Relatorio?> GetRelatorioByIdAsync(int id);
         Task AddRelatorioAsync(Relatorio relatorio);

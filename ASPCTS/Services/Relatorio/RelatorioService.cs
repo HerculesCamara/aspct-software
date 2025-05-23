@@ -15,6 +15,10 @@ namespace ASPCTS.Services
         {
             _repository = repository;
         }
+        public IQueryable<Relatorio> GetQueryableRelatorios()
+        {
+            return _repository.GetQueryableRelatorios();
+        }
 
         public async Task<IEnumerable<Relatorio>> GetAllRelatorioAsync()
         {

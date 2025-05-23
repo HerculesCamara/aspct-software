@@ -10,6 +10,8 @@ namespace ASPCTS.Repositories
     {
         Task<IEnumerable<Responsavel>> GetAllResponsaveisAsync();
         Task<Responsavel?> GetResponsavelByIdAsync(int id);
+        Task<Responsavel?> GetResponsavelByEmailAsync(string email);
+        Task<IEnumerable<Responsavel>> GetResponsaveisByCPFAsync(string cpf);
         Task AddResponsavelAsync(Responsavel responsavel);
         Task UpdateResponsavelAsync(Responsavel responsavel);
         Task DesativarResponsavelAsync(int id);

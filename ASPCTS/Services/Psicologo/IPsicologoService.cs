@@ -10,7 +10,8 @@ namespace ASPCTS.Services
     {
         Task<IEnumerable<Psicologo>> GetAllPsicologosAsync();
         Task<Psicologo?> GetPsicologoByIdAsync(int id);
-        Task<Psicologo?> GetPsicologoByCPFAsync(string cpf);
+        Task<Psicologo?> GetPsicologoByEmailAsync(string email);
+        Task<IEnumerable<Psicologo>> GetPsicologosByCPFAsync(string cpf);
         Task AddPsicologoAsync(Psicologo psicologo);
         Task UpdatePsicologoAsync(Psicologo psicologo);
         Task DesativarPsicologoAsync(int id);

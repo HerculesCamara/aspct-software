@@ -39,18 +39,18 @@ namespace ASPCTS.Repositories
                 .ToListAsync();
         }
 
-        public async  Task<Psicologo?> GetPsicologoByCPFAsync(string cpf)
+        public async Task<Psicologo?> GetPsicologoByEmailAsync(string email)
         {
             return await _context.Usuarios.
                 OfType<Psicologo>()
-                .FirstOrDefaultAsync(p => p.CPF == cpf);
+                .FirstOrDefaultAsync(p => p.Email == email);
         }
-
-        public async Task<Psicologo?> GetPsicologoByCrpAsync(string crp)
+        public async Task<IEnumerable<Psicologo>> GetPsicologosByCPFAsync(string cpf)
         {
             return await _context.Usuarios.
                 OfType<Psicologo>()
-                .FirstOrDefaultAsync(p => p.CRP == crp);
+                .Where(p => p.CPF == cpf)
+                .ToListAsync();
         }
         public async Task AddPsicologoAsync(Psicologo psicologo)
         {

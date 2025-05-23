@@ -26,19 +26,14 @@ namespace ASPCTS.Services
             return await _psicologoRepository.GetPsicologoByIdAsync(id);
         }
 
-        public async Task<IEnumerable<Psicologo>> GetPsicologoByNameAsync(string name)
-        {
-            return await _psicologoRepository.GetPsicologoByNameAsync(name);
-        }
 
-        public async Task<Psicologo?> GetPsicologoByCPFAsync(string cpf)
+        public async Task<Psicologo?> GetPsicologoByEmailAsync(string email)
         {
-            return await _psicologoRepository.GetPsicologoByCPFAsync(cpf);
+            return await _psicologoRepository.GetPsicologoByEmailAsync(email);
         }
-
-        public async Task<Psicologo?> GetPsicologoByCrpAsync(string crp)
+        public async Task<IEnumerable<Psicologo>> GetPsicologosByCPFAsync(string cpf)
         {
-            return await _psicologoRepository.GetPsicologoByCrpAsync(crp);
+            return await _psicologoRepository.GetPsicologosByCPFAsync(cpf);
         }
 
         public async Task AddPsicologoAsync(Psicologo psicologo)

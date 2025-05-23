@@ -17,6 +17,12 @@ namespace ASPCTS.Repositories
             _context = context;
         }
 
+        public IQueryable<Relatorio> GetQueryableRelatorios()
+        {
+            // Retorna um IQueryable para permitir filtragem no service/controller
+            return _context.Relatorios.AsNoTracking().Where(r => r.Ativo);
+        }
+
         public async Task<IEnumerable<Relatorio>> GetAllRelatorioAsync()
         {
             return await _context.Relatorios.ToListAsync();
@@ -24,7 +30,19 @@ namespace ASPCTS.Repositories
 
         public async Task<Relatorio?> GetRelatorioByIdAsync(int id)
         {
-            return await _context.Relatorios.FindAsync(id);
+            Guid guidId = new Guid();
+            try
+            {
+                guidId = new Guid(id.ToString("D32"));
+            }
+            catch
+            {
+                return null;
+            }
+            return await _context.Relatorios
+                .AsNoTracking()
+                .Include(r => r.Crianca)
+                .FirstOrDefaultAsync(r => r.Id == guidId);
         }
 
         public async Task<IEnumerable<Relatorio>> GetRelatorioByCriancaIdAsync(int criancaId)

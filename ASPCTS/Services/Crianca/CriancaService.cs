@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using ASPCTS.Models;
 using ASPCTS.Repositories;
@@ -114,5 +115,16 @@ namespace ASPCTS.Services
 
             await _criancaRepository.DesativarCriancaAsync(id);
         }
+
+        public async Task<bool> UsuarioTemAcessoACriancaAsync(int criancaId, ClaimsPrincipal user)
+        {
+            if (user.Identity is not { IsAuthenticated: true }) return false;
+
+            var userId = int.Parse(user.FindFirst("id")?.Value ?? "0");
+            var userRole = user.FindFirst(ClaimTypes.Role)?.Value ?? "";
+
+            return await _criancaRepository.UsuarioTemAcessoACriancaAsync(criancaId, userId, userRole);
+        }
+
     }
 }

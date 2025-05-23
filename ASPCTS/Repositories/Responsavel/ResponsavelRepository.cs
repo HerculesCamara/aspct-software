@@ -30,6 +30,19 @@ namespace ASPCTS.Repositories
                 OfType<Responsavel>().
                 FirstOrDefaultAsync(p => p.Id == id);
         }
+        public async Task<Responsavel?> GetResponsavelByEmailAsync(string email)
+        {
+            return await _context.Usuarios.
+                OfType<Responsavel>()
+                .FirstOrDefaultAsync(p => p.Email == email);
+        }
+        public async Task<IEnumerable<Responsavel>> GetResponsaveisByCPFAsync(string cpf)
+        {
+            return await _context.Usuarios.
+                OfType<Responsavel>()
+                .Where(p => p.CPF == cpf)
+                .ToListAsync();
+        }
 
         public async Task AddResponsavelAsync(Responsavel responsavel)
         {

@@ -83,5 +83,18 @@ namespace ASPCTS.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+        public async Task<bool> UsuarioTemAcessoACriancaAsync(int criancaId, int userId, string userRole)
+        {
+            var crianca = await _context.Criancas.FindAsync(criancaId);
+            if (crianca == null) return false;
+
+            return userRole switch
+            {
+                "Responsavel" => crianca.PaiId == userId || crianca.MaeId == userId,
+                "Psicologo" => crianca.PsicologoId == userId,
+                _ => false
+            };
+        }
+
     }
 }

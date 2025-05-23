@@ -4,6 +4,8 @@ using ASPCTS.Services;
 using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using ASPCTS.DTOs.Crianca;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace ASPCTS.Controllers
 {
@@ -21,15 +23,27 @@ namespace ASPCTS.Controllers
         }
 
         [HttpGet("buscar-todas-criancas")]
+        [Authorize(Roles = "Responsavel,Psicologo")]
         [ProducesResponseType(typeof(IEnumerable<CriancaDTO>), 200)]
         public async Task<IActionResult> GetAllCriancas()
         {
             var criancas = await _criancaService.GetAllCriancasAsync();
-            var criancasDto = _mapper.Map<IEnumerable<CriancaDTO>>(criancas);
+            var usuario = User;
+
+            // Filtrar só crianças que o usuário tem acesso
+            var criancasFiltradas = new List<Crianca>();
+            foreach(var c in criancas)
+            {
+                if (await _criancaService.UsuarioTemAcessoACriancaAsync(c.Id, usuario))
+                    criancasFiltradas.Add(c);
+            }
+
+            var criancasDto = _mapper.Map<IEnumerable<CriancaDTO>>(criancasFiltradas);
             return Ok(criancasDto);
         }
 
         [HttpGet("buscar-crianca-por-id/{id}")]
+        [Authorize(Roles = "Responsavel,Psicologo")]
         [ProducesResponseType(typeof(CriancaDTO), 200)]
         public async Task<IActionResult> GetCriancaById(int id)
         {
@@ -37,11 +51,15 @@ namespace ASPCTS.Controllers
             if (crianca == null)
                 return NotFound();
 
+            if (!await _criancaService.UsuarioTemAcessoACriancaAsync(id, User))
+                return Forbid();
+
             var criancaDto = _mapper.Map<CriancaDTO>(crianca);
             return Ok(criancaDto);
         }
 
         [HttpPost("adicionar-crianca")]
+        [Authorize(Roles = "Psicologo")]
         [ProducesResponseType(typeof(CriancaDTO), 400)]
         [ProducesResponseType(typeof(CriancaDTO), 201)]
         public async Task<IActionResult> AddCrianca([FromBody] CriancaCreateDTO novaCriancaDto)
@@ -57,6 +75,7 @@ namespace ASPCTS.Controllers
         }
 
         [HttpPatch("atualizar-crianca/{id}")]
+        [Authorize(Roles = "Psicologo")]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> AtualizarCriancaParcial(int id, [FromBody] CriancaUpdateDTO criancaDto)
@@ -64,6 +83,9 @@ namespace ASPCTS.Controllers
             var criancaExistente = await _criancaService.GetCriancaByIdAsync(id);
             if (criancaExistente == null)
                 return NotFound("Criança não encontrada.");
+
+            if (!await _criancaService.UsuarioTemAcessoACriancaAsync(id, User))
+                return Forbid();
 
             // Atualiza apenas os campos que foram enviados no DTO
             if (!string.IsNullOrWhiteSpace(criancaDto.Nome))
@@ -83,14 +105,18 @@ namespace ASPCTS.Controllers
             return NoContent();
         }
 
-
         [HttpDelete("desativar-crianca/{id}")]
+        [Authorize(Roles = "Psicologo")]
         [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
         public async Task<IActionResult> DeleteCrianca(int id)
         {
             var crianca = await _criancaService.GetCriancaByIdAsync(id);
             if (crianca == null)
                 return NotFound();
+
+            if (!await _criancaService.UsuarioTemAcessoACriancaAsync(id, User))
+                return Forbid();
 
             await _criancaService.DesativarCriancaAsync(id);
             return NoContent();

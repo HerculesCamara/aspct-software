@@ -1,16 +1,17 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using ASPCTS.Models;
 using ASPCTS.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 
 namespace ASPCTS.Controllers
 {
     [Route("[controller]")]
+    [Authorize]
     public class relatorioController : Controller
     {
         private readonly IRelatorioService _relatorioService;
@@ -20,63 +21,98 @@ namespace ASPCTS.Controllers
             _relatorioService = relatorioService;
         }
 
-        // GET: api/relatorio
+        // GET: relatorio/buscar-todos-relatorios
         [HttpGet("buscar-todos-relatorios")]
-        [ProducesResponseType(typeof(IEnumerable<Relatorio>), 200)]
-        [ProducesResponseType(typeof(Relatorio), 404)]
         public async Task<ActionResult<IEnumerable<Relatorio>>> GetAll()
         {
-            var relatorios = await _relatorioService.GetAllRelatorioAsync();
+            var tipoUsuario = User.FindFirst("TipoUsuario")?.Value ?? string.Empty;
+            var usuarioId = int.Parse(User.FindFirst("Id")?.Value ?? "0");
+
+            var relatorios = await _relatorioService.GetQueryableRelatorios()
+                .Where(r =>
+                    (tipoUsuario == "Psicologo" && r.Crianca != null && r.Crianca.PsicologoId == usuarioId) ||
+                    (tipoUsuario == "Responsavel" && r.Crianca != null && (r.Crianca.PaiId == usuarioId || r.Crianca.MaeId == usuarioId))
+                ).ToListAsync();
+
             return Ok(relatorios);
         }
 
-        // GET: api/relatorio/{id}
+        // GET: relatorio/buscar-relatorio-por-id/{id}
         [HttpGet("buscar-relatorio-por-id/{id}")]
-        [ProducesResponseType(typeof(Relatorio), 200)]
-        [ProducesResponseType(typeof(Relatorio), 404)]
         public async Task<ActionResult<Relatorio>> GetById(int id)
         {
             var relatorio = await _relatorioService.GetRelatorioByIdAsync(id);
-            if (relatorio == null)
-                return NotFound();
+            if (relatorio == null) return NotFound();
+
+            var tipoUsuario = User.FindFirst("TipoUsuario")?.Value ?? string.Empty;
+            var usuarioId = int.Parse(User.FindFirst("Id")?.Value ?? "0");
+
+            var crianca = relatorio.Crianca;
+
+            bool autorizado = tipoUsuario switch
+            {
+                "Psicologo" => crianca != null && crianca.PsicologoId == usuarioId,
+                "Responsavel" => crianca != null && (crianca.PaiId == usuarioId || crianca.MaeId == usuarioId),
+                _ => false
+            };
+
+            if (!autorizado)
+                return Forbid("Você não tem permissão para acessar este relatório.");
 
             return Ok(relatorio);
         }
 
-        // POST: api/relatorio
+        // POST: relatorio/adicionar-relatorio
         [HttpPost("adicionar-relatorio")]
-        [ProducesResponseType(typeof(Relatorio), 201)]
-        [ProducesResponseType(typeof(Relatorio), 400)]
-        [ProducesResponseType(typeof(Relatorio), 404)]
         public async Task<ActionResult> Create([FromBody] Relatorio relatorio)
         {
+            var tipoUsuario = User.FindFirst("TipoUsuario")?.Value ?? string.Empty;
+            var usuarioId = int.Parse(User.FindFirst("Id")?.Value ?? "0");
+
+            if (tipoUsuario != "Psicologo")
+                return Forbid("Apenas psicólogos podem criar relatórios.");
+
+            if (relatorio.Crianca?.PsicologoId != usuarioId)
+                return Forbid("Você só pode criar relatórios para suas próprias crianças.");
+
             await _relatorioService.AddRelatorioAsync(relatorio);
             return CreatedAtAction(nameof(GetById), new { id = relatorio.Id }, relatorio);
         }
 
-        // PUT: api/relatorio/{id}
-        [HttpPut("atualizar-relatorio-por-id/{id}")]
-        [ProducesResponseType(typeof(Relatorio), 204)]
-        [ProducesResponseType(typeof(Relatorio), 400)]
-        [ProducesResponseType(typeof(Relatorio), 404)]
+        // PATCH: relatorio/atualizar-relatorio-por-id/{id}
+        [HttpPatch("atualizar-relatorio-por-id/{id}")]
         public async Task<ActionResult> Update(int id, [FromBody] Relatorio relatorio)
         {
-            if (relatorio.Id != Guid.Parse(id.ToString()))
+            var relatorioExistente = await _relatorioService.GetRelatorioByIdAsync(id);
+            if (relatorioExistente == null)
+                return NotFound();
+
+            if (relatorio.Id != relatorioExistente.Id)
                 return BadRequest("ID do relatório não confere.");
+
+            var tipoUsuario = User.FindFirst("TipoUsuario")?.Value ?? string.Empty;
+            var usuarioId = int.Parse(User.FindFirst("Id")?.Value ?? "0");
+
+            if (tipoUsuario != "Psicologo" || relatorioExistente.Crianca == null || relatorioExistente.Crianca.PsicologoId != usuarioId)
+                return Forbid("Apenas o psicólogo vinculado pode editar este relatório.");
 
             await _relatorioService.UpdateRelatorioAsync(relatorio);
             return NoContent();
         }
 
-        // DELETE: api/relatorio/{id}
+        // DELETE: relatorio/desativar-relatorio/{id}
         [HttpDelete("desativar-relatorio/{id}")]
-        [ProducesResponseType(typeof(Relatorio), 204)]
-        [ProducesResponseType(typeof(Relatorio), 404)]
         public async Task<ActionResult> Inativar(int id)
         {
             var relatorio = await _relatorioService.GetRelatorioByIdAsync(id);
             if (relatorio == null)
                 return NotFound();
+
+            var tipoUsuario = User.FindFirst("TipoUsuario")?.Value ?? string.Empty;
+            var usuarioId = int.Parse(User.FindFirst("Id")?.Value ?? "0");
+
+            if (tipoUsuario != "Psicologo" || relatorio.Crianca == null || relatorio.Crianca.PsicologoId != usuarioId)
+                return Forbid("Apenas o psicólogo vinculado pode excluir este relatório.");
 
             await _relatorioService.DesativarRelatorioAsync(id);
             return NoContent();

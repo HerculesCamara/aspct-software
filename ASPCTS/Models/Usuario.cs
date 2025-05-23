@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BCrypt.Net;
 
 namespace ASPCTS.Models
 {
@@ -20,7 +21,17 @@ namespace ASPCTS.Models
             Feminino
         }
         public Genero Sexo { get; set; }
-        public DateTimeOffset DataNascimento { get; set; } = DateTimeOffset.UtcNow; 
+        public DateTimeOffset DataNascimento { get; set; } = DateTimeOffset.UtcNow;
         public bool Ativo { get; set; } = true;
+
+        public void SetPassword(string plainPassword)
+        {
+            Password = BCrypt.Net.BCrypt.HashPassword(plainPassword);
+        }
+
+        public bool VerifyPassword(string plainPassword)
+        {
+            return BCrypt.Net.BCrypt.Verify(plainPassword, Password);
+        }
     }
 }

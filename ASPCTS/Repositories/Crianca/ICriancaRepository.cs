@@ -15,5 +15,6 @@ namespace ASPCTS.Repositories
         Task AddCriancaAsync(Crianca crianca);
         Task UpdateCriancaAsync(Crianca crianca);
         Task DesativarCriancaAsync(int id);
+        Task<bool> UsuarioTemAcessoACriancaAsync(int criancaId, int usuarioId, string role);
     }
 }
