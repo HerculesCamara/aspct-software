@@ -140,14 +140,14 @@ namespace ASPCTS.Controllers
                 .Where(c => c.PsicologoId == psicologoId)
                 .ToListAsync();
 
-            var relatorios = criancas.Select(c => new
+            var estatisticas = criancas.Select(c => new
             {
                 Crianca = c.Nome,
                 AtividadesConcluidas = c.Atividades.Count(a => a.Concluida == true),
                 AtividadesPendentes = c.Atividades.Count(a => a.Concluida == false)
             });
 
-            return Ok(relatorios);
+            return Ok(estatisticas);
         }
 
     }
