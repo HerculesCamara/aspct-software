@@ -6,6 +6,7 @@ O aplicativo visa preencher a lacuna na comunicação entre os diversos envolvid
 ## **Arquitetura da Aplicação**
 A aplicação ASPCTS é construída seguindo os princípios de uma arquitetura em camadas (ou N-Tier), promovendo a separação de responsabilidades, alta coesão e baixo acoplamento, o que resulta em um código mais manutenível, testável e escalável.
 ### **Estrutura de Pastas Detalhada**
+```
 ASPCTS/
 ├── bin/                             # Binários compilados do projeto.
 ├── Context/                         # Camada de Acesso a Dados (parte do Entity Framework Core).
@@ -105,32 +106,33 @@ ASPCTS/
 ├── Program.cs                       # Ponto de entrada e configuração da aplicação (injeção de dependências, pipeline HTTP).
 ├── ASPCTS.sln                       # Arquivo de solução do Visual Studio.
 └── README.md                        # Este arquivo.
+```
 ### **Detalhes dos Componentes e Fluxo de Dados**
 1. **appsettings.json / appsettings.Development.json**:
-   1. **Configurações Essenciais**: Contém a string de conexão para o banco de dados ("ConexaoPadrao": "Server=localhost\\SQLEXPRESS;Database=ASPCTSDB;Trusted\_Connection=True;TrustServerCertificate=True;") e as configurações para a geração e validação de JWTs (chave, emissor, audiência, tempo de expiração).
-   1. **Logging**: Define os níveis de log para diferentes categorias da aplicação.
+    **Configurações Essenciais**: Contém a string de conexão para o banco de dados (`"ConexaoPadrao": "Server=localhost\\SQLEXPRESS;Database=ASPCTSDB;Trusted\_Connection=True;TrustServerCertificate=True;"`) e as configurações para a geração e validação de JWTs (chave, emissor, audiência, tempo de expiração).
+   **Logging**: Define os níveis de log para diferentes categorias da aplicação.
 1. **Program.cs**:
-   1. **Injeção de Dependências (DI)**: É o coração da inicialização da aplicação. Todos os serviços e repositórios são registrados aqui (builder.Services.AddScoped<Interface, Implementacao>();), garantindo que suas dependências sejam resolvidas automaticamente pelo contêiner de DI. Isso promove o baixo acoplamento e a testabilidade.
-   1. **Configuração do Database Context**: ApplicationDbContext é configurado para usar SQL Server.
-   1. **Autenticação JWT Bearer**: Configura o middleware de autenticação, definindo como os tokens JWT serão validados (quem pode emitir, para quem se destina, validade, chave de assinatura). O RoleClaimType e NameClaimType são definidos para que o ASP.NET Core possa extrair informações de função e identificador do usuário do token.
-   1. **Swagger/OpenAPI**: Configura o Swagger para gerar uma documentação interativa da API, incluindo a configuração de segurança para tokens Bearer, permitindo testes de endpoints autenticados diretamente na interface.
-   1. **AutoMapper**: Registra o AutoMapper e seus perfis de mapeamento.
-   1. **CORS**: Define políticas de Cross-Origin Resource Sharing para controlar quais origens podem acessar a API.
+    **Injeção de Dependências (DI)**: É o coração da inicialização da aplicação. Todos os serviços e repositórios são registrados aqui (`builder.Services.AddScoped<Interface, Implementacao>();`), garantindo que suas dependências sejam resolvidas automaticamente pelo contêiner de DI. Isso promove o baixo acoplamento e a testabilidade.
+    **Configuração do Database Context**: ApplicationDbContext é configurado para usar SQL Server.
+    **Autenticação JWT Bearer**: Configura o middleware de autenticação, definindo como os tokens JWT serão validados (quem pode emitir, para quem se destina, validade, chave de assinatura). O RoleClaimType e NameClaimType são definidos para que o ASP.NET Core possa extrair informações de função e identificador do usuário do token.
+    **Swagger/OpenAPI**: Configura o Swagger para gerar uma documentação interativa da API, incluindo a configuração de segurança para tokens Bearer, permitindo testes de endpoints autenticados diretamente na interface.
+    **AutoMapper**: Registra o AutoMapper e seus perfis de mapeamento.
+    **CORS**: Define políticas de Cross-Origin Resource Sharing para controlar quais origens podem acessar a API.
 1. **Models**:
-   1. Representam as entidades do domínio e o esquema do banco de dados. Por exemplo, Usuario é uma classe base para Psicologo e Responsavel, utilizando a herança Table-Per-Hierarchy (TPH) no Entity Framework Core, onde todos os tipos da hierarquia são mapeados para uma única tabela no banco de dados, com uma coluna discriminadora (Tipo) para identificar o tipo real da linha.
+    Representam as entidades do domínio e o esquema do banco de dados. Por exemplo, Usuario é uma classe base para Psicologo e Responsavel, utilizando a herança Table-Per-Hierarchy (TPH) no Entity Framework Core, onde todos os tipos da hierarquia são mapeados para uma única tabela no banco de dados, com uma coluna discriminadora (Tipo) para identificar o tipo real da linha.
 1. **Context/ApplicationDbContext.cs**:
-   1. **Mapeamento Objeto-Relacional**: Define como suas classes Model se relacionam com as tabelas do banco de dados.
-   1. **Relacionamentos de Chave Estrangeira**: Configura relacionamentos HasOne/WithMany e HasForeignKey para garantir a integridade referencial, com OnDelete(DeleteBehavior.Restrict) para evitar exclusões em cascata indesejadas que poderiam corromper dados.
-   1. **Conversores de Valor**: Para tipos complexos como List<string> (MarcosAlcancados), um Value Converter é usado para serializar a lista em uma string JSON para armazenamento no banco de dados e deserializá-la de volta ao recuperar.
+    **Mapeamento Objeto-Relacional**: Define como suas classes Model se relacionam com as tabelas do banco de dados.
+    **Relacionamentos de Chave Estrangeira**: Configura relacionamentos HasOne/WithMany e HasForeignKey para garantir a integridade referencial, com OnDelete(DeleteBehavior.Restrict) para evitar exclusões em cascata indesejadas que poderiam corromper dados.
+    **Conversores de Valor**: Para tipos complexos como List<string> (MarcosAlcancados), um Value Converter é usado para serializar a lista em uma string JSON para armazenamento no banco de dados e deserializá-la de volta ao recuperar.
 1. **Repositories**:
-   1. **Abstração de Persistência**: Define contratos (IRepository) e implementações (Repository) para as operações de CRUD. Eles encapsulam a lógica de acesso ao banco de dados e são a única camada que interage diretamente com o DbContext.
+    **Abstração de Persistência**: Define contratos (IRepository) e implementações (Repository) para as operações de CRUD. Eles encapsulam a lógica de acesso ao banco de dados e são a única camada que interage diretamente com o DbContext.
 1. **Services**:
-   1. **Lógica de Negócio**: Esta é a camada onde as regras de negócio complexas e validações são aplicadas *antes* que os dados sejam persistidos. Por exemplo:
+    **Lógica de Negócio**: Esta é a camada onde as regras de negócio complexas e validações são aplicadas *antes* que os dados sejam persistidos. Por exemplo:
       1. CriancaService: Valida se uma criança tem pelo menos um pai ou mãe válido(a) e do gênero correto ao ser adicionada.
       1. AtividadeService: Garante que uma atividade só possa ser desativada se não estiver concluída.
       1. PsicologoService e UsuarioService: Verificam a unicidade de CPF e e-mail para evitar duplicações.
       1. ResponsavelService: Orquestra operações complexas envolvendo responsáveis e suas crianças, atividades e relatórios, utilizando o AutoMapper para conversão de DTOs.
-   1. **JWT Generation**: JwtService é uma implementação de um serviço específico para geração de tokens JWT, desacoplando a lógica de autenticação dos controladores.
+    **JWT Generation**: JwtService é uma implementação de um serviço específico para geração de tokens JWT, desacoplando a lógica de autenticação dos controladores.
 1. **DTOs**:
    1. **Separação de Preocupações**: Projetados para serem usados na camada de API. Eles evitam que os modelos de domínio sejam expostos diretamente, protegendo o esquema do banco de dados e permitindo que a API tenha um contrato diferente dos modelos internos.
 ## **Tecnologias Utilizadas**
@@ -154,38 +156,67 @@ Para executar este projeto, você precisará ter os seguintes softwares instalad
 Siga estes passos para configurar e executar a API ASPCTS em seu ambiente local:
 ### **1. Clonar o Repositório**
 Primeiro, clone o repositório para o seu ambiente local usando Git:
-
-git clone <URL\_DO\_SEU\_REPOSITORIO>
+```
+git clone github.com/HerculesCamara/aspct-software
 cd ASPCTS
-
-*Substitua <URL\_DO\_SEU\_REPOSITORIO> pela URL real do seu repositório Git (e.g., https://github.com/seu-usuario/ASPCTS.git).*
+```
 ### **2. Instalar as Dependências (Pacotes NuGet)**
 A aplicação utiliza diversos pacotes NuGet para sua funcionalidade. As versões exatas estão especificadas no seu arquivo ASPCTS.csproj. Para instalá-los, execute o comando de restauração de pacotes NuGet no terminal, dentro da pasta raiz do projeto (ASPCTS/):
-
+```
 dotnet restore
-
+```
 Este comando fará o download e instalará todos os pacotes listados no ItemGroup do seu csproj, incluindo:
 
 - **AutoMapper (12.0.1)**: Biblioteca de mapeamento de objetos.
-  - Instalação Manual (se necessário): dotnet add package AutoMapper --version 12.0.1
+  - Instalação Manual (se necessário): 
+  ```
+  dotnet add package AutoMapper --version 12.0.1
+  ```
 - **AutoMapper.Extensions.Microsoft.DependencyInjection (12.0.1)**: Integração do AutoMapper com o sistema de injeção de dependência do .NET.
-  - Instalação Manual: dotnet add package AutoMapper.Extensions.Microsoft.DependencyInjection --version 12.0.1
+  - Instalação Manual: 
+  ```
+  dotnet add package AutoMapper.Extensions.Microsoft.DependencyInjection --version 12.0.1
+  ```
 - **BCrypt.Net-Next (4.0.3)**: Biblioteca para hash de senhas seguro.
-  - Instalação Manual: dotnet add package BCrypt.Net-Next --version 4.0.3
+  - Instalação Manual: 
+  ```
+  dotnet add package BCrypt.Net-Next --version 4.0.3
+  ```
 - **Microsoft.AspNetCore.JsonPatch (9.0.4)**: Para aplicar operações JSON Patch.
-  - Instalação Manual: dotnet add package Microsoft.AspNetCore.JsonPatch --version 9.0.4
+  - Instalação Manual: 
+  ```
+  dotnet add package Microsoft.AspNetCore.JsonPatch --version 9.0.4
+  ```
 - **Microsoft.EntityFrameworkCore (9.0.5)**: Pacote principal do Entity Framework Core.
-  - Instalação Manual: dotnet add package Microsoft.EntityFrameworkCore --version 9.0.5
+  - Instalação Manual: 
+  ```
+  dotnet add package Microsoft.EntityFrameworkCore --version 9.0.5
+  ```
 - **Microsoft.EntityFrameworkCore.Design (9.0.5)**: Ferramentas de tempo de design para migrações do EF Core.
-  - Instalação Manual: dotnet add package Microsoft.EntityFrameworkCore.Design --version 9.0.5
+  - Instalação Manual: 
+  ```
+  dotnet add package Microsoft.EntityFrameworkCore.Design --version 9.0.5
+  ```
 - **Microsoft.EntityFrameworkCore.SqlServer (9.0.5)**: Provedor de banco de dados SQL Server para EF Core.
-  - Instalação Manual: dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 9.0.5
+  - Instalação Manual: 
+  ```
+  dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 9.0.5
+  ```
 - **Microsoft.EntityFrameworkCore.Tools (9.0.5)**: Ferramentas de linha de comando para EF Core (usadas para migrações).
-  - Instalação Manual: dotnet add package Microsoft.EntityFrameworkCore.Tools --version 9.0.5
+  - Instalação Manual: 
+  ```
+  dotnet add package Microsoft.EntityFrameworkCore.Tools --version 9.0.5
+  ```
 - **Swashbuckle.AspNetCore (8.1.2)**: Geração de documentação Swagger/OpenAPI.
-  - Instalação Manual: dotnet add package Swashbuckle.AspNetCore --version 8.1.2
+  - Instalação Manual: 
+  ```
+  dotnet add package Swashbuckle.AspNetCore --version 8.1.2
+  ```
 - **Microsoft.AspNetCore.Authentication.JwtBearer (8.0.5)**: Suporte para autenticação JWT Bearer.
-  - Instalação Manual: dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer --version 8.0.5
+  - Instalação Manual: 
+  ```
+  dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer --version 8.0.5
+  ```
 ### **3. Configurar o Banco de Dados**
 3\.1. Verificar e Configurar a String de Conexão:
 
