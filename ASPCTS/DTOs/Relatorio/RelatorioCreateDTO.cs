@@ -10,7 +10,6 @@ namespace ASPCTS.DTOs.Relatorio
         public int CriancaId { get; set; }
         public string Titulo { get; set; } = string.Empty;
         public string Tipo { get; set; } = string.Empty;
-        public DateTime Data { get; set; }
         public string Resumo { get; set; } = string.Empty;
         public List<string> MarcosAlcancados { get; set; } = new();
         public string Observacoes { get; set; } = string.Empty;

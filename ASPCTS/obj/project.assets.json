@@ -102,10 +102,10 @@
           }
         }
       },
-      "Microsoft.AspNetCore.Authentication.JwtBearer/8.0.0": {
+      "Microsoft.AspNetCore.Authentication.JwtBearer/8.0.5": {
         "type": "package",
         "dependencies": {
-          "Microsoft.IdentityModel.Protocols.OpenIdConnect": "7.0.3"
+          "Microsoft.IdentityModel.Protocols.OpenIdConnect": "7.1.2"
         },
         "compile": {
           "lib/net8.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll": {
@@ -907,7 +907,7 @@
           }
         }
       },
-      "Microsoft.IdentityModel.Abstractions/7.0.3": {
+      "Microsoft.IdentityModel.Abstractions/7.1.2": {
         "type": "package",
         "compile": {
           "lib/net8.0/Microsoft.IdentityModel.Abstractions.dll": {
@@ -920,10 +920,10 @@
           }
         }
       },
-      "Microsoft.IdentityModel.JsonWebTokens/7.0.3": {
+      "Microsoft.IdentityModel.JsonWebTokens/7.1.2": {
         "type": "package",
         "dependencies": {
-          "Microsoft.IdentityModel.Tokens": "7.0.3"
+          "Microsoft.IdentityModel.Tokens": "7.1.2"
         },
         "compile": {
           "lib/net8.0/Microsoft.IdentityModel.JsonWebTokens.dll": {
@@ -936,10 +936,10 @@
           }
         }
       },
-      "Microsoft.IdentityModel.Logging/7.0.3": {
+      "Microsoft.IdentityModel.Logging/7.1.2": {
         "type": "package",
         "dependencies": {
-          "Microsoft.IdentityModel.Abstractions": "7.0.3"
+          "Microsoft.IdentityModel.Abstractions": "7.1.2"
         },
         "compile": {
           "lib/net8.0/Microsoft.IdentityModel.Logging.dll": {
@@ -952,11 +952,11 @@
           }
         }
       },
-      "Microsoft.IdentityModel.Protocols/7.0.3": {
+      "Microsoft.IdentityModel.Protocols/7.1.2": {
         "type": "package",
         "dependencies": {
-          "Microsoft.IdentityModel.Logging": "7.0.3",
-          "Microsoft.IdentityModel.Tokens": "7.0.3"
+          "Microsoft.IdentityModel.Logging": "7.1.2",
+          "Microsoft.IdentityModel.Tokens": "7.1.2"
         },
         "compile": {
           "lib/net8.0/Microsoft.IdentityModel.Protocols.dll": {
@@ -969,11 +969,11 @@
           }
         }
       },
-      "Microsoft.IdentityModel.Protocols.OpenIdConnect/7.0.3": {
+      "Microsoft.IdentityModel.Protocols.OpenIdConnect/7.1.2": {
         "type": "package",
         "dependencies": {
-          "Microsoft.IdentityModel.Protocols": "7.0.3",
-          "System.IdentityModel.Tokens.Jwt": "7.0.3"
+          "Microsoft.IdentityModel.Protocols": "7.1.2",
+          "System.IdentityModel.Tokens.Jwt": "7.1.2"
         },
         "compile": {
           "lib/net8.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll": {
@@ -986,10 +986,10 @@
           }
         }
       },
-      "Microsoft.IdentityModel.Tokens/7.0.3": {
+      "Microsoft.IdentityModel.Tokens/7.1.2": {
         "type": "package",
         "dependencies": {
-          "Microsoft.IdentityModel.Logging": "7.0.3"
+          "Microsoft.IdentityModel.Logging": "7.1.2"
         },
         "compile": {
           "lib/net8.0/Microsoft.IdentityModel.Tokens.dll": {
@@ -1078,13 +1078,13 @@
           }
         }
       },
-      "Swashbuckle.AspNetCore/8.1.1": {
+      "Swashbuckle.AspNetCore/8.1.2": {
         "type": "package",
         "dependencies": {
           "Microsoft.Extensions.ApiDescription.Server": "6.0.5",
-          "Swashbuckle.AspNetCore.Swagger": "8.1.1",
-          "Swashbuckle.AspNetCore.SwaggerGen": "8.1.1",
-          "Swashbuckle.AspNetCore.SwaggerUI": "8.1.1"
+          "Swashbuckle.AspNetCore.Swagger": "8.1.2",
+          "Swashbuckle.AspNetCore.SwaggerGen": "8.1.2",
+          "Swashbuckle.AspNetCore.SwaggerUI": "8.1.2"
         },
         "build": {
           "build/Swashbuckle.AspNetCore.props": {}
@@ -1093,7 +1093,7 @@
           "buildMultiTargeting/Swashbuckle.AspNetCore.props": {}
         }
       },
-      "Swashbuckle.AspNetCore.Swagger/8.1.1": {
+      "Swashbuckle.AspNetCore.Swagger/8.1.2": {
         "type": "package",
         "dependencies": {
           "Microsoft.OpenApi": "1.6.23"
@@ -1112,10 +1112,10 @@
           "Microsoft.AspNetCore.App"
         ]
       },
-      "Swashbuckle.AspNetCore.SwaggerGen/8.1.1": {
+      "Swashbuckle.AspNetCore.SwaggerGen/8.1.2": {
         "type": "package",
         "dependencies": {
-          "Swashbuckle.AspNetCore.Swagger": "8.1.1"
+          "Swashbuckle.AspNetCore.Swagger": "8.1.2"
         },
         "compile": {
           "lib/net8.0/Swashbuckle.AspNetCore.SwaggerGen.dll": {
@@ -1128,7 +1128,7 @@
           }
         }
       },
-      "Swashbuckle.AspNetCore.SwaggerUI/8.1.1": {
+      "Swashbuckle.AspNetCore.SwaggerUI/8.1.2": {
         "type": "package",
         "compile": {
           "lib/net8.0/Swashbuckle.AspNetCore.SwaggerUI.dll": {
@@ -1384,11 +1384,11 @@
           "buildTransitive/net8.0/_._": {}
         }
       },
-      "System.IdentityModel.Tokens.Jwt/7.0.3": {
+      "System.IdentityModel.Tokens.Jwt/7.1.2": {
         "type": "package",
         "dependencies": {
-          "Microsoft.IdentityModel.JsonWebTokens": "7.0.3",
-          "Microsoft.IdentityModel.Tokens": "7.0.3"
+          "Microsoft.IdentityModel.JsonWebTokens": "7.1.2",
+          "Microsoft.IdentityModel.Tokens": "7.1.2"
         },
         "compile": {
           "lib/net8.0/System.IdentityModel.Tokens.Jwt.dll": {
@@ -1854,10 +1854,10 @@
         "logo.png"
       ]
     },
-    "Microsoft.AspNetCore.Authentication.JwtBearer/8.0.0": {
-      "sha512": "rwxaZYHips5M9vqxRkGfJthTx+Ws4O4yCuefn17J371jL3ouC5Ker43h2hXb5yd9BMnImE9rznT75KJHm6bMgg==",
+    "Microsoft.AspNetCore.Authentication.JwtBearer/8.0.5": {
+      "sha512": "VqKkXLxsCVHNmSdUIuBtDSXL3OqX0yfDjcZxCcYD8VFNpTutl53BCFHzMb3wvw3asneHnURzC2R8VvIXn3l5Lw==",
       "type": "package",
-      "path": "microsoft.aspnetcore.authentication.jwtbearer/8.0.0",
+      "path": "microsoft.aspnetcore.authentication.jwtbearer/8.0.5",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -1865,7 +1865,7 @@
         "THIRD-PARTY-NOTICES.TXT",
         "lib/net8.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll",
         "lib/net8.0/Microsoft.AspNetCore.Authentication.JwtBearer.xml",
-        "microsoft.aspnetcore.authentication.jwtbearer.8.0.0.nupkg.sha512",
+        "microsoft.aspnetcore.authentication.jwtbearer.8.0.5.nupkg.sha512",
         "microsoft.aspnetcore.authentication.jwtbearer.nuspec"
       ]
     },
@@ -3746,10 +3746,10 @@
         "microsoft.identity.client.extensions.msal.nuspec"
       ]
     },
-    "Microsoft.IdentityModel.Abstractions/7.0.3": {
-      "sha512": "cfPUWdjigLIRIJSKz3uaZxShgf86RVDXHC1VEEchj1gnY25akwPYpbrfSoIGDCqA9UmOMdlctq411+2pAViFow==",
+    "Microsoft.IdentityModel.Abstractions/7.1.2": {
+      "sha512": "33eTIA2uO/L9utJjZWbKsMSVsQf7F8vtd6q5mQX7ZJzNvCpci5fleD6AeANGlbbb7WX7XKxq9+Dkb5e3GNDrmQ==",
       "type": "package",
-      "path": "microsoft.identitymodel.abstractions/7.0.3",
+      "path": "microsoft.identitymodel.abstractions/7.1.2",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -3765,14 +3765,14 @@
         "lib/net8.0/Microsoft.IdentityModel.Abstractions.xml",
         "lib/netstandard2.0/Microsoft.IdentityModel.Abstractions.dll",
         "lib/netstandard2.0/Microsoft.IdentityModel.Abstractions.xml",
-        "microsoft.identitymodel.abstractions.7.0.3.nupkg.sha512",
+        "microsoft.identitymodel.abstractions.7.1.2.nupkg.sha512",
         "microsoft.identitymodel.abstractions.nuspec"
       ]
     },
-    "Microsoft.IdentityModel.JsonWebTokens/7.0.3": {
-      "sha512": "vxjHVZbMKD3rVdbvKhzAW+7UiFrYToUVm3AGmYfKSOAwyhdLl/ELX1KZr+FaLyyS5VReIzWRWJfbOuHM9i6ywg==",
+    "Microsoft.IdentityModel.JsonWebTokens/7.1.2": {
+      "sha512": "cloLGeZolXbCJhJBc5OC05uhrdhdPL6MWHuVUnkkUvPDeK7HkwThBaLZ1XjBQVk9YhxXE2OvHXnKi0PLleXxDg==",
       "type": "package",
-      "path": "microsoft.identitymodel.jsonwebtokens/7.0.3",
+      "path": "microsoft.identitymodel.jsonwebtokens/7.1.2",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -3788,14 +3788,14 @@
         "lib/net8.0/Microsoft.IdentityModel.JsonWebTokens.xml",
         "lib/netstandard2.0/Microsoft.IdentityModel.JsonWebTokens.dll",
         "lib/netstandard2.0/Microsoft.IdentityModel.JsonWebTokens.xml",
-        "microsoft.identitymodel.jsonwebtokens.7.0.3.nupkg.sha512",
+        "microsoft.identitymodel.jsonwebtokens.7.1.2.nupkg.sha512",
         "microsoft.identitymodel.jsonwebtokens.nuspec"
       ]
     },
-    "Microsoft.IdentityModel.Logging/7.0.3": {
-      "sha512": "b6GbGO+2LOTBEccHhqoJsOsmemG4A/MY+8H0wK/ewRhiG+DCYwEnucog1cSArPIY55zcn+XdZl0YEiUHkpDISQ==",
+    "Microsoft.IdentityModel.Logging/7.1.2": {
+      "sha512": "YCxBt2EeJP8fcXk9desChkWI+0vFqFLvBwrz5hBMsoh0KJE6BC66DnzkdzkJNqMltLromc52dkdT206jJ38cTw==",
       "type": "package",
-      "path": "microsoft.identitymodel.logging/7.0.3",
+      "path": "microsoft.identitymodel.logging/7.1.2",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -3811,14 +3811,14 @@
         "lib/net8.0/Microsoft.IdentityModel.Logging.xml",
         "lib/netstandard2.0/Microsoft.IdentityModel.Logging.dll",
         "lib/netstandard2.0/Microsoft.IdentityModel.Logging.xml",
-        "microsoft.identitymodel.logging.7.0.3.nupkg.sha512",
+        "microsoft.identitymodel.logging.7.1.2.nupkg.sha512",
         "microsoft.identitymodel.logging.nuspec"
       ]
     },
-    "Microsoft.IdentityModel.Protocols/7.0.3": {
-      "sha512": "BtwR+tctBYhPNygyZmt1Rnw74GFrJteW+1zcdIgyvBCjkek6cNwPPqRfdhzCv61i+lwyNomRi8+iI4QKd4YCKA==",
+    "Microsoft.IdentityModel.Protocols/7.1.2": {
+      "sha512": "SydLwMRFx6EHPWJ+N6+MVaoArN1Htt92b935O3RUWPY1yUF63zEjvd3lBu79eWdZUwedP8TN2I5V9T3nackvIQ==",
       "type": "package",
-      "path": "microsoft.identitymodel.protocols/7.0.3",
+      "path": "microsoft.identitymodel.protocols/7.1.2",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -3834,14 +3834,14 @@
         "lib/net8.0/Microsoft.IdentityModel.Protocols.xml",
         "lib/netstandard2.0/Microsoft.IdentityModel.Protocols.dll",
         "lib/netstandard2.0/Microsoft.IdentityModel.Protocols.xml",
-        "microsoft.identitymodel.protocols.7.0.3.nupkg.sha512",
+        "microsoft.identitymodel.protocols.7.1.2.nupkg.sha512",
         "microsoft.identitymodel.protocols.nuspec"
       ]
     },
-    "Microsoft.IdentityModel.Protocols.OpenIdConnect/7.0.3": {
-      "sha512": "W97TraHApDNArLwpPcXfD+FZH7njJsfEwZE9y9BoofeXMS8H0LBBobz0VOmYmMK4mLdOKxzN7SFT3Ekg0FWI3Q==",
+    "Microsoft.IdentityModel.Protocols.OpenIdConnect/7.1.2": {
+      "sha512": "6lHQoLXhnMQ42mGrfDkzbIOR3rzKM1W1tgTeMPLgLCqwwGw0d96xFi/UiX/fYsu7d6cD5MJiL3+4HuI8VU+sVQ==",
       "type": "package",
-      "path": "microsoft.identitymodel.protocols.openidconnect/7.0.3",
+      "path": "microsoft.identitymodel.protocols.openidconnect/7.1.2",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -3857,14 +3857,14 @@
         "lib/net8.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.xml",
         "lib/netstandard2.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll",
         "lib/netstandard2.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.xml",
-        "microsoft.identitymodel.protocols.openidconnect.7.0.3.nupkg.sha512",
+        "microsoft.identitymodel.protocols.openidconnect.7.1.2.nupkg.sha512",
         "microsoft.identitymodel.protocols.openidconnect.nuspec"
       ]
     },
-    "Microsoft.IdentityModel.Tokens/7.0.3": {
-      "sha512": "wB+LlbDjhnJ98DULjmFepqf9eEMh/sDs6S6hFh68iNRHmwollwhxk+nbSSfpA5+j+FbRyNskoaY4JsY1iCOKCg==",
+    "Microsoft.IdentityModel.Tokens/7.1.2": {
+      "sha512": "oICJMqr3aNEDZOwnH5SK49bR6Z4aX0zEAnOLuhloumOSuqnNq+GWBdQyrgILnlcT5xj09xKCP/7Y7gJYB+ls/g==",
       "type": "package",
-      "path": "microsoft.identitymodel.tokens/7.0.3",
+      "path": "microsoft.identitymodel.tokens/7.1.2",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -3880,7 +3880,7 @@
         "lib/net8.0/Microsoft.IdentityModel.Tokens.xml",
         "lib/netstandard2.0/Microsoft.IdentityModel.Tokens.dll",
         "lib/netstandard2.0/Microsoft.IdentityModel.Tokens.xml",
-        "microsoft.identitymodel.tokens.7.0.3.nupkg.sha512",
+        "microsoft.identitymodel.tokens.7.1.2.nupkg.sha512",
         "microsoft.identitymodel.tokens.nuspec"
       ]
     },
@@ -3993,24 +3993,24 @@
         "packageIcon.png"
       ]
     },
-    "Swashbuckle.AspNetCore/8.1.1": {
-      "sha512": "HJHexmU0PiYevgTLvKjYkxEtclF2w4O7iTd3Ef3p6KeT0kcYLpkFVgCw6glpGS57h8769anv8G+NFi9Kge+/yw==",
+    "Swashbuckle.AspNetCore/8.1.2": {
+      "sha512": "GcfwU8slhnC7ZKOGVkGheuyGgwIpqeLI11mtSO5P6cm1ej7U3LF83Okt9Jp76ar2zI7herN2yLcvIgzP63wgPQ==",
       "type": "package",
-      "path": "swashbuckle.aspnetcore/8.1.1",
+      "path": "swashbuckle.aspnetcore/8.1.2",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "build/Swashbuckle.AspNetCore.props",
         "buildMultiTargeting/Swashbuckle.AspNetCore.props",
         "docs/package-readme.md",
-        "swashbuckle.aspnetcore.8.1.1.nupkg.sha512",
+        "swashbuckle.aspnetcore.8.1.2.nupkg.sha512",
         "swashbuckle.aspnetcore.nuspec"
       ]
     },
-    "Swashbuckle.AspNetCore.Swagger/8.1.1": {
-      "sha512": "h+8D5jQtnl6X4f2hJQwf0Khj0SnCQANzirCELjXJ6quJ4C1aNNCvJrAsQ+4fOKAMqJkvW48cKj79ftG+YoGcRg==",
+    "Swashbuckle.AspNetCore.Swagger/8.1.2": {
+      "sha512": "5GTvC2Lbv3LnEHllm4N3LxpRSrDkVSBjUPlPHg3oIN7VJhxxuysYuTXzS2hExf3tuCPsTa5/TaDoCzfBlI05SQ==",
       "type": "package",
-      "path": "swashbuckle.aspnetcore.swagger/8.1.1",
+      "path": "swashbuckle.aspnetcore.swagger/8.1.2",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -4024,14 +4024,14 @@
         "lib/netstandard2.0/Swashbuckle.AspNetCore.Swagger.pdb",
         "lib/netstandard2.0/Swashbuckle.AspNetCore.Swagger.xml",
         "package-readme.md",
-        "swashbuckle.aspnetcore.swagger.8.1.1.nupkg.sha512",
+        "swashbuckle.aspnetcore.swagger.8.1.2.nupkg.sha512",
         "swashbuckle.aspnetcore.swagger.nuspec"
       ]
     },
-    "Swashbuckle.AspNetCore.SwaggerGen/8.1.1": {
-      "sha512": "2EuPzXSNleOOzYvziERWRLnk1Oz9i0Z1PimaUFy1SasBqeV/rG+eMfwFAMtTaf4W6gvVOzRcUCNRHvpBIIzr+A==",
+    "Swashbuckle.AspNetCore.SwaggerGen/8.1.2": {
+      "sha512": "R91Wt4NpBJAgkx924Scv22WC80NmZH1VMgUNbmvqNfXE3H07noA4Q8wUMkBwJehQiRJr3Ts519JoScKazbLcww==",
       "type": "package",
-      "path": "swashbuckle.aspnetcore.swaggergen/8.1.1",
+      "path": "swashbuckle.aspnetcore.swaggergen/8.1.2",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -4045,14 +4045,14 @@
         "lib/netstandard2.0/Swashbuckle.AspNetCore.SwaggerGen.pdb",
         "lib/netstandard2.0/Swashbuckle.AspNetCore.SwaggerGen.xml",
         "package-readme.md",
-        "swashbuckle.aspnetcore.swaggergen.8.1.1.nupkg.sha512",
+        "swashbuckle.aspnetcore.swaggergen.8.1.2.nupkg.sha512",
         "swashbuckle.aspnetcore.swaggergen.nuspec"
       ]
     },
-    "Swashbuckle.AspNetCore.SwaggerUI/8.1.1": {
-      "sha512": "GDLX/MpK4oa2nYC1N/zN2UidQTtVKLPF6gkdEmGb0RITEwpJG9Gu8olKqPYnKqVeFn44JZoCS0M2LGRKXP8B/A==",
+    "Swashbuckle.AspNetCore.SwaggerUI/8.1.2": {
+      "sha512": "qsGf333N+sa2XmxqU287HZEP/W1OrPwk2DpXHb0fL2PhXj5fatUv50ExePJb7yiA6kpKLVpGReJD0tj2Kai1CA==",
       "type": "package",
-      "path": "swashbuckle.aspnetcore.swaggerui/8.1.1",
+      "path": "swashbuckle.aspnetcore.swaggerui/8.1.2",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -4066,7 +4066,7 @@
         "lib/netstandard2.0/Swashbuckle.AspNetCore.SwaggerUI.pdb",
         "lib/netstandard2.0/Swashbuckle.AspNetCore.SwaggerUI.xml",
         "package-readme.md",
-        "swashbuckle.aspnetcore.swaggerui.8.1.1.nupkg.sha512",
+        "swashbuckle.aspnetcore.swaggerui.8.1.2.nupkg.sha512",
         "swashbuckle.aspnetcore.swaggerui.nuspec"
       ]
     },
@@ -4415,10 +4415,10 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "System.IdentityModel.Tokens.Jwt/7.0.3": {
-      "sha512": "caEe+OpQNYNiyZb+DJpUVROXoVySWBahko2ooNfUcllxa9ZQUM8CgM/mDjP6AoFn6cQU9xMmG+jivXWub8cbGg==",
+    "System.IdentityModel.Tokens.Jwt/7.1.2": {
+      "sha512": "Thhbe1peAmtSBFaV/ohtykXiZSOkx59Da44hvtWfIMFofDA3M3LaVyjstACf2rKGn4dEDR2cUpRAZ0Xs/zB+7Q==",
       "type": "package",
-      "path": "system.identitymodel.tokens.jwt/7.0.3",
+      "path": "system.identitymodel.tokens.jwt/7.1.2",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -4434,7 +4434,7 @@
         "lib/net8.0/System.IdentityModel.Tokens.Jwt.xml",
         "lib/netstandard2.0/System.IdentityModel.Tokens.Jwt.dll",
         "lib/netstandard2.0/System.IdentityModel.Tokens.Jwt.xml",
-        "system.identitymodel.tokens.jwt.7.0.3.nupkg.sha512",
+        "system.identitymodel.tokens.jwt.7.1.2.nupkg.sha512",
         "system.identitymodel.tokens.jwt.nuspec"
       ]
     },
@@ -5107,31 +5107,32 @@
   },
   "projectFileDependencyGroups": {
     "net8.0": [
+      "AutoMapper >= 12.0.1",
       "AutoMapper.Extensions.Microsoft.DependencyInjection >= 12.0.1",
       "BCrypt.Net-Next >= 4.0.3",
-      "Microsoft.AspNetCore.Authentication.JwtBearer >= 8.0.0",
+      "Microsoft.AspNetCore.Authentication.JwtBearer >= 8.0.5",
       "Microsoft.AspNetCore.JsonPatch >= 9.0.4",
       "Microsoft.EntityFrameworkCore >= 9.0.5",
       "Microsoft.EntityFrameworkCore.Design >= 9.0.5",
       "Microsoft.EntityFrameworkCore.SqlServer >= 9.0.5",
       "Microsoft.EntityFrameworkCore.Tools >= 9.0.5",
-      "Swashbuckle.AspNetCore >= 8.1.1"
+      "Swashbuckle.AspNetCore >= 8.1.2"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\gusta\\.nuget\\packages\\": {}
+    "C:\\Users\\gustavo.adm\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\gusta\\Desktop\\API\\ASPCTS\\ASPCTS.csproj",
+      "projectUniqueName": "C:\\Users\\gustavo.moreira\\Desktop\\TCC\\aspct-software\\ASPCTS\\ASPCTS.csproj",
       "projectName": "ASPCTS",
-      "projectPath": "C:\\Users\\gusta\\Desktop\\API\\ASPCTS\\ASPCTS.csproj",
-      "packagesPath": "C:\\Users\\gusta\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\gusta\\Desktop\\API\\ASPCTS\\obj\\",
+      "projectPath": "C:\\Users\\gustavo.moreira\\Desktop\\TCC\\aspct-software\\ASPCTS\\ASPCTS.csproj",
+      "packagesPath": "C:\\Users\\gustavo.adm\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\gustavo.moreira\\Desktop\\TCC\\aspct-software\\ASPCTS\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\gusta\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\gustavo.adm\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
@@ -5160,6 +5161,10 @@
       "net8.0": {
         "targetAlias": "net8.0",
         "dependencies": {
+          "AutoMapper": {
+            "target": "Package",
+            "version": "[12.0.1, )"
+          },
           "AutoMapper.Extensions.Microsoft.DependencyInjection": {
             "target": "Package",
             "version": "[12.0.1, )"
@@ -5170,7 +5175,7 @@
           },
           "Microsoft.AspNetCore.Authentication.JwtBearer": {
             "target": "Package",
-            "version": "[8.0.0, )"
+            "version": "[8.0.5, )"
           },
           "Microsoft.AspNetCore.JsonPatch": {
             "target": "Package",
@@ -5198,7 +5203,7 @@
           },
           "Swashbuckle.AspNetCore": {
             "target": "Package",
-            "version": "[8.1.1, )"
+            "version": "[8.1.2, )"
           }
         },
         "imports": [
@@ -5220,7 +5225,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.404/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.408/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

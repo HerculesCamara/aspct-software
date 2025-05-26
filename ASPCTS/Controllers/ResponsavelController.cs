@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 
-// ... usings mantidos
 
 namespace ASPCTS.Controllers
 {

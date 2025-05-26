@@ -7,114 +7,211 @@ using ASPCTS.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ASPCTS.DTOs.Relatorio;
+using AutoMapper;
+using System.Security.Claims; // Necessário para ClaimTypes
 
 namespace ASPCTS.Controllers
 {
-    [Route("[controller]")]
-    [Authorize]
-    public class relatorioController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    [Authorize] // Garante que todos os endpoints aqui exigem autenticação
+    public class relatorioController : ControllerBase
     {
         private readonly IRelatorioService _relatorioService;
+        private readonly IMapper _mapper;
 
-        public relatorioController(IRelatorioService relatorioService)
+        public relatorioController(IRelatorioService relatorioService, IMapper mapper)
         {
             _relatorioService = relatorioService;
+            _mapper = mapper;
         }
 
-        // GET: relatorio/buscar-todos-relatorios
+        // GET: api/relatorio/buscar-todos-relatorios
+        // Permite que psicólogos e responsáveis vejam apenas os relatórios de suas crianças
         [HttpGet("buscar-todos-relatorios")]
-        public async Task<ActionResult<IEnumerable<Relatorio>>> GetAll()
+        [ProducesResponseType(typeof(IEnumerable<RelatorioDTO>), 200)]
+        public async Task<ActionResult<IEnumerable<RelatorioDTO>>> GetAll()
         {
-            var tipoUsuario = User.FindFirst("TipoUsuario")?.Value ?? string.Empty;
-            var usuarioId = int.Parse(User.FindFirst("Id")?.Value ?? "0");
+            var tipoUsuario = User.FindFirst(ClaimTypes.Role)?.Value;
+            var usuarioId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
 
-            var relatorios = await _relatorioService.GetQueryableRelatorios()
-                .Where(r =>
-                    (tipoUsuario == "Psicologo" && r.Crianca != null && r.Crianca.PsicologoId == usuarioId) ||
-                    (tipoUsuario == "Responsavel" && r.Crianca != null && (r.Crianca.PaiId == usuarioId || r.Crianca.MaeId == usuarioId))
-                ).ToListAsync();
+            if (string.IsNullOrEmpty(tipoUsuario) || usuarioId == 0)
+            {
+                return Unauthorized("Informações do usuário não encontradas no token.");
+            }
 
-            return Ok(relatorios);
+            var relatoriosQuery = _relatorioService.GetQueryableRelatorios()
+                                                  .Where(r => r.Ativo); // Sempre filtrar por relatórios ativos
+
+            // Lógica de filtragem baseada no tipo de usuário
+            if (tipoUsuario == "Psicologo")
+            {
+                relatoriosQuery = relatoriosQuery.Where(r => r.Crianca != null && r.Crianca.PsicologoId == usuarioId);
+            }
+            else if (tipoUsuario == "Responsavel")
+            {
+                relatoriosQuery = relatoriosQuery.Where(r => r.Crianca != null && (r.Crianca.PaiId == usuarioId || r.Crianca.MaeId == usuarioId));
+            }
+            else
+            {
+                // Se o tipo de usuário não for Psicólogo nem Responsável, não retorna nada.
+                // Ou você pode retornar Forbid(), dependendo da sua política de segurança.
+                return Forbid("Seu tipo de usuário não tem permissão para acessar relatórios.");
+            }
+
+            var relatorios = await relatoriosQuery.ToListAsync();
+            var relatoriosDto = _mapper.Map<IEnumerable<RelatorioDTO>>(relatorios);
+            return Ok(relatoriosDto);
         }
 
-        // GET: relatorio/buscar-relatorio-por-id/{id}
+        // GET: api/relatorio/buscar-relatorio-por-id/{id}
+        // Permite que psicólogos e responsáveis vejam um relatório específico, desde que vinculado
         [HttpGet("buscar-relatorio-por-id/{id}")]
-        public async Task<ActionResult<Relatorio>> GetById(int id)
+        [ProducesResponseType(typeof(RelatorioDTO), 200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(403)]
+        public async Task<ActionResult<RelatorioDTO>> GetById(int id)
         {
             var relatorio = await _relatorioService.GetRelatorioByIdAsync(id);
-            if (relatorio == null) return NotFound();
+            if (relatorio == null || !relatorio.Ativo) return NotFound("Relatório não encontrado ou inativo.");
 
-            var tipoUsuario = User.FindFirst("TipoUsuario")?.Value ?? string.Empty;
-            var usuarioId = int.Parse(User.FindFirst("Id")?.Value ?? "0");
+            var tipoUsuario = User.FindFirst(ClaimTypes.Role)?.Value;
+            var usuarioId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+
+            if (string.IsNullOrEmpty(tipoUsuario) || usuarioId == 0)
+            {
+                return Unauthorized("Informações do usuário não encontradas no token.");
+            }
 
             var crianca = relatorio.Crianca;
+            if (crianca == null) return NotFound("Informações da criança vinculada ao relatório não encontradas.");
 
-            bool autorizado = tipoUsuario switch
+            bool autorizado = false;
+            if (tipoUsuario == "Psicologo" && crianca.PsicologoId == usuarioId)
             {
-                "Psicologo" => crianca != null && crianca.PsicologoId == usuarioId,
-                "Responsavel" => crianca != null && (crianca.PaiId == usuarioId || crianca.MaeId == usuarioId),
-                _ => false
-            };
+                autorizado = true;
+            }
+            else if (tipoUsuario == "Responsavel" && (crianca.PaiId == usuarioId || crianca.MaeId == usuarioId))
+            {
+                autorizado = true;
+            }
 
             if (!autorizado)
+            {
                 return Forbid("Você não tem permissão para acessar este relatório.");
+            }
 
-            return Ok(relatorio);
+            var relatorioDto = _mapper.Map<RelatorioDTO>(relatorio);
+            return Ok(relatorioDto);
         }
 
-        // POST: relatorio/adicionar-relatorio
+        // POST: api/relatorio/adicionar-relatorio
+        // Exclusivamente para psicólogos
         [HttpPost("adicionar-relatorio")]
-        public async Task<ActionResult> Create([FromBody] Relatorio relatorio)
+        [Authorize(Roles = "Psicologo")] // Apenas psicólogos podem criar relatórios
+        [ProducesResponseType(typeof(RelatorioDTO), 201)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(403)]
+        [ProducesResponseType(404)]
+        public async Task<ActionResult> Create([FromBody] RelatorioCreateDTO dto)
         {
-            var tipoUsuario = User.FindFirst("TipoUsuario")?.Value ?? string.Empty;
-            var usuarioId = int.Parse(User.FindFirst("Id")?.Value ?? "0");
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-            if (tipoUsuario != "Psicologo")
-                return Forbid("Apenas psicólogos podem criar relatórios.");
+            var psicologoId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            if (psicologoId == 0)
+            {
+                return Unauthorized("ID do psicólogo não encontrado no token.");
+            }
 
-            if (relatorio.Crianca?.PsicologoId != usuarioId)
-                return Forbid("Você só pode criar relatórios para suas próprias crianças.");
+            // Precisamos verificar se a criança existe e está vinculada ao psicólogo logado
+            // Assumimos que você tem um ChildService ou similar para buscar a criança
+            // Para este exemplo, vou simular a busca ou você pode injetar IChildService
+            // temporariamente vamos usar uma consulta direta ao banco de dados se _context estiver disponível
+            // ou adicionar um método GetCriancaById no IRelatorioService (ou ChildService)
+            var crianca = await _relatorioService.GetQueryableRelatorios()
+                                                .Where(r => r.CriancaId == dto.CriancaId)
+                                                .Select(r => r.Crianca)
+                                                .FirstOrDefaultAsync();
+
+            if (crianca == null)
+            {
+                return NotFound("Criança não encontrada.");
+            }
+
+            if (crianca.PsicologoId != psicologoId)
+            {
+                return Forbid("Você só pode criar relatórios para crianças sob sua responsabilidade.");
+            }
+
+            var relatorio = _mapper.Map<Relatorio>(dto);
+            relatorio.CriancaId = dto.CriancaId; // Garante a vinculação
+            // Data e Ativo serão definidos no AddRelatorioAsync() no repositório
 
             await _relatorioService.AddRelatorioAsync(relatorio);
-            return CreatedAtAction(nameof(GetById), new { id = relatorio.Id }, relatorio);
+
+            var relatorioResultDto = _mapper.Map<RelatorioDTO>(relatorio);
+            return CreatedAtAction(nameof(GetById), new { id = relatorio.Id }, relatorioResultDto);
         }
 
-        // PATCH: relatorio/atualizar-relatorio-por-id/{id}
+        // PATCH: api/relatorio/atualizar-relatorio-por-id/{id}
+        // Exclusivamente para psicólogos
         [HttpPatch("atualizar-relatorio-por-id/{id}")]
-        public async Task<ActionResult> Update(int id, [FromBody] Relatorio relatorio)
+        [Authorize(Roles = "Psicologo")] // Apenas psicólogos podem atualizar
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(403)]
+        [ProducesResponseType(404)]
+        public async Task<ActionResult> Update(int id, [FromBody] RelatorioUpdateDTO dto)
         {
             var relatorioExistente = await _relatorioService.GetRelatorioByIdAsync(id);
-            if (relatorioExistente == null)
-                return NotFound();
+            if (relatorioExistente == null || !relatorioExistente.Ativo)
+                return NotFound("Relatório não encontrado ou inativo.");
 
-            if (relatorio.Id != relatorioExistente.Id)
-                return BadRequest("ID do relatório não confere.");
+            var psicologoId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            if (psicologoId == 0)
+            {
+                return Unauthorized("ID do psicólogo não encontrado no token.");
+            }
 
-            var tipoUsuario = User.FindFirst("TipoUsuario")?.Value ?? string.Empty;
-            var usuarioId = int.Parse(User.FindFirst("Id")?.Value ?? "0");
-
-            if (tipoUsuario != "Psicologo" || relatorioExistente.Crianca == null || relatorioExistente.Crianca.PsicologoId != usuarioId)
+            if (relatorioExistente.Crianca?.PsicologoId != psicologoId)
+            {
                 return Forbid("Apenas o psicólogo vinculado pode editar este relatório.");
+            }
 
-            await _relatorioService.UpdateRelatorioAsync(relatorio);
+            // O AutoMapper cuida de mapear apenas as propriedades não nulas do DTO
+            _mapper.Map(dto, relatorioExistente);
+
+            await _relatorioService.UpdateRelatorioAsync(relatorioExistente);
             return NoContent();
         }
 
-        // DELETE: relatorio/desativar-relatorio/{id}
+        // DELETE: api/relatorio/desativar-relatorio/{id}
+        // Exclusivamente para psicólogos
         [HttpDelete("desativar-relatorio/{id}")]
-        public async Task<ActionResult> Inativar(int id)
+        [Authorize(Roles = "Psicologo")] // Apenas psicólogos podem desativar
+        [ProducesResponseType(204)]
+        [ProducesResponseType(403)]
+        [ProducesResponseType(404)]
+        public async Task<ActionResult> Desativar(int id)
         {
             var relatorio = await _relatorioService.GetRelatorioByIdAsync(id);
-            if (relatorio == null)
-                return NotFound();
+            if (relatorio == null || !relatorio.Ativo)
+                return NotFound("Relatório não encontrado ou já inativo.");
 
-            var tipoUsuario = User.FindFirst("TipoUsuario")?.Value ?? string.Empty;
-            var usuarioId = int.Parse(User.FindFirst("Id")?.Value ?? "0");
+            var psicologoId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            if (psicologoId == 0)
+            {
+                return Unauthorized("ID do psicólogo não encontrado no token.");
+            }
 
-            if (tipoUsuario != "Psicologo" || relatorio.Crianca == null || relatorio.Crianca.PsicologoId != usuarioId)
-                return Forbid("Apenas o psicólogo vinculado pode excluir este relatório.");
+            if (relatorio.Crianca?.PsicologoId != psicologoId)
+                return Forbid("Apenas o psicólogo vinculado pode desativar este relatório.");
 
-            await _relatorioService.DesativarRelatorioAsync(id);
+            await _relatorioService.DesativarRelatorioAsync(id); // Lógica de desativação já está no serviço/repositório
             return NoContent();
         }
     }

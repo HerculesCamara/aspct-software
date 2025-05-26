@@ -3,7 +3,9 @@ using ASPCTS.Mappings;
 using ASPCTS.Repositories;
 using ASPCTS.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 using Microsoft.IdentityModel.Tokens;

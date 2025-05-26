@@ -7,7 +7,7 @@ namespace ASPCTS.DTOs.Relatorio
 {
     public class RelatorioUpdateDTO
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
         public string Titulo { get; set; } = string.Empty;
         public string Tipo { get; set; } = string.Empty;
         public DateTime Data { get; set; }

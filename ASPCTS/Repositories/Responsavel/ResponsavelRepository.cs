@@ -67,7 +67,7 @@ namespace ASPCTS.Repositories
                 .Where(c => c.PsicologoId == psicologoId &&
                            (c.PaiId == responsavelId || c.MaeId == responsavelId))
                 .SelectMany(c => new[] { c.Pai, c.Mae })
-                .FirstOrDefaultAsync(r => r.Id == responsavelId);
+                .FirstOrDefaultAsync(r => r != null && r.Id == responsavelId);
 
         public async Task<Responsavel?> GetResponsavelByIdAsync(int id) =>
             await _context.Responsaveis

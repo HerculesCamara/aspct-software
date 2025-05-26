@@ -30,30 +30,23 @@ namespace ASPCTS.Repositories
 
         public async Task<Relatorio?> GetRelatorioByIdAsync(int id)
         {
-            Guid guidId = new Guid();
-            try
-            {
-                guidId = new Guid(id.ToString("D32"));
-            }
-            catch
-            {
-                return null;
-            }
             return await _context.Relatorios
                 .AsNoTracking()
                 .Include(r => r.Crianca)
-                .FirstOrDefaultAsync(r => r.Id == guidId);
+                .FirstOrDefaultAsync(r => r.Id == id);
         }
 
         public async Task<IEnumerable<Relatorio>> GetRelatorioByCriancaIdAsync(int criancaId)
         {
             return await _context.Relatorios
-                .Where(r => r.CriancaId == criancaId)
+                .Where(r => r.CriancaId == criancaId && r.Ativo)
                 .ToListAsync();
         }
 
         public async Task AddRelatorioAsync(Relatorio relatorio)
-        {
+        {   
+            relatorio.Data = DateTime.UtcNow; // Define a data atual como data do relatório
+            relatorio.Ativo = true; // Define o relatório como ativo ao ser criado
             _context.Relatorios.Add(relatorio);
             await _context.SaveChangesAsync();
         }
@@ -69,7 +62,8 @@ namespace ASPCTS.Repositories
             var relatorio = await _context.Relatorios.FindAsync(id);
             if (relatorio != null)
             {
-                _context.Relatorios.Remove(relatorio);
+                relatorio.Ativo = false; // Marca o relatório como inativo
+                _context.Relatorios.Update(relatorio);
                 await _context.SaveChangesAsync();
             }
         }

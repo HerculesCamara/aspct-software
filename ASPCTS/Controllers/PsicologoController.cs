@@ -5,14 +5,13 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using ASPCTS.Context;
 using ASPCTS.DTOs.Psicologo;
-using ASPCTS.DTOs.Atividade;
+using ASPCTS.DTOs.Atividade; // Certifique-se de ter este DTO
 using ASPCTS.Models;
 using ASPCTS.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ASPCTS.DTOs.Relatorio;
 
 namespace ASPCTS.Controllers
 {
@@ -21,14 +20,14 @@ namespace ASPCTS.Controllers
     public class psicologoController : ControllerBase
     {
         private readonly IPsicologoService _psicologoService;
-        private readonly IAtividadeService _atividadeService;
+        private readonly IAtividadeService _atividadeService; // Serviço para atividades
         private readonly IMapper _mapper;
         private readonly ApplicationDbContext _context;
 
         public psicologoController(IPsicologoService psicologoService, IAtividadeService atividadeService, IMapper mapper, ApplicationDbContext context)
         {
             _psicologoService = psicologoService;
-            _atividadeService = atividadeService;
+            _atividadeService = atividadeService; // Injeção de dependência do serviço de atividades
             _mapper = mapper;
             _context = context;
         }
@@ -125,7 +124,6 @@ namespace ASPCTS.Controllers
             return NoContent();
         }
 
-        // Exemplo de endpoint adicional com filtro baseado no psicologo logado
         [Authorize(Roles = "Psicologo")]
         [HttpGet("minhas-criancas")]
         public async Task<IActionResult> GetMinhasCriancas()
@@ -136,6 +134,41 @@ namespace ASPCTS.Controllers
                 .ToListAsync();
 
             return Ok(criancas);
+        }
+
+
+        [Authorize(Roles = "Psicologo")]
+        [HttpPost("criar-atividade")]
+        [ProducesResponseType(typeof(AtividadeDTO), 201)] // Retorna a atividade criada com status 201 Created
+        [ProducesResponseType(400)] // Bad Request em caso de dados inválidos
+        [ProducesResponseType(404)] // Not Found se a criança não existir
+        public async Task<IActionResult> CriarAtividade([FromBody] AtividadeCreateDTO atividadeDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var psicologoId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+
+            // Verificar se a criança existe e está vinculada a este psicólogo (recomendado para segurança)
+            var crianca = await _context.Criancas
+                                        .FirstOrDefaultAsync(c => c.Id == atividadeDto.CriancaId && c.PsicologoId == psicologoId);
+
+            if (crianca == null)
+            {
+                return NotFound("Criança não encontrada ou não vinculada a este psicólogo.");
+            }
+
+            var atividade = _mapper.Map<Atividade>(atividadeDto);
+            atividade.PsicologoId = psicologoId; // Associa a atividade ao psicólogo logado
+            atividade.Concluida = false;
+            atividade.DataCriacao = DateTime.UtcNow; // Garante que a data de criação é definida
+
+            await _atividadeService.AddAtividadeAsync(atividade);
+            var novaAtividadeDto = _mapper.Map<AtividadeDTO>(atividade);
+            
+            return CreatedAtAction(nameof(GetMinhasCriancas), new { id = novaAtividadeDto.Id }, novaAtividadeDto);
         }
     }
 }
