@@ -61,19 +61,11 @@ namespace ASPCTS.Controllers
             return Ok(atividadeDto);
         }
 
-        [HttpPost("adicionar-atividade")]
-        [Authorize(Roles = "Psicologo")]
-        [ProducesResponseType(typeof(AtividadeDTO), 400)]
-        [ProducesResponseType(typeof(AtividadeDTO), 201)]
-        public async Task<IActionResult> AddAtividade([FromBody] AtividadeCreateDTO atividadeDto)
+        [HttpGet("buscar-atividade-por-crianca-id/{criancaId}")]
+        public async Task<IActionResult> GetAtividadePorCriancaId(int criancaId)
         {
-            if (atividadeDto == null)
-                return BadRequest("Atividade não pode ser nula.");
-
-            var atividade = _mapper.Map<Atividade>(atividadeDto);
-            await _atividadeService.AddAtividadeAsync(atividade);
-            var atividadeResultDto = _mapper.Map<AtividadeDTO>(atividade);
-            return CreatedAtAction(nameof(GetAtividadeById), new { id = atividade.Id }, atividadeResultDto);
+            var atividades = await _atividadeService.BuscarAtividadePorCriancaId(criancaId);
+            return Ok(atividades);
         }
 
         [HttpPatch("atualizar-atividade/{id}")]

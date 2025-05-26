@@ -5120,19 +5120,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\gustavo.adm\\.nuget\\packages\\": {}
+    "C:\\Users\\gusta\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\gustavo.moreira\\Desktop\\TCC\\aspct-software\\ASPCTS\\ASPCTS.csproj",
+      "projectUniqueName": "C:\\Users\\gusta\\Desktop\\API\\ASPCTS\\ASPCTS.csproj",
       "projectName": "ASPCTS",
-      "projectPath": "C:\\Users\\gustavo.moreira\\Desktop\\TCC\\aspct-software\\ASPCTS\\ASPCTS.csproj",
-      "packagesPath": "C:\\Users\\gustavo.adm\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\gustavo.moreira\\Desktop\\TCC\\aspct-software\\ASPCTS\\obj\\",
+      "projectPath": "C:\\Users\\gusta\\Desktop\\API\\ASPCTS\\ASPCTS.csproj",
+      "packagesPath": "C:\\Users\\gusta\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\gusta\\Desktop\\API\\ASPCTS\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\gustavo.adm\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\gusta\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
@@ -5225,7 +5225,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.408/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.404/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

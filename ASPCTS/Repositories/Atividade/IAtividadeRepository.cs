@@ -10,6 +10,7 @@ namespace ASPCTS.Repositories
     {
         Task<IEnumerable<Atividade>> GetAllAtividadesAsync();
         Task<Atividade?> GetAtividadeByIdAsync(int id);
+        Task<IEnumerable<Atividade>> BuscarAtividadePorCriancaId(int criancaId);
         Task<IEnumerable<Atividade>> GetAtividadeByTituloAsync(string name);
         Task AddAtividadeAsync(Atividade Atividade);
         Task UpdateAtividadeAsync(Atividade Atividade);

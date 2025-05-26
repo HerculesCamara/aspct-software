@@ -79,14 +79,14 @@ namespace ASPCTS.Migrations
                     b.Property<DateTimeOffset>("DataNascimento")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<int>("MaeId")
+                    b.Property<int?>("MaeId")
                         .HasColumnType("int");
 
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PaiId")
+                    b.Property<int?>("PaiId")
                         .HasColumnType("int");
 
                     b.Property<int>("PsicologoId")
@@ -110,9 +110,11 @@ namespace ASPCTS.Migrations
 
             modelBuilder.Entity("ASPCTS.Models.Relatorio", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("Ativo")
                         .HasColumnType("bit");
@@ -256,14 +258,12 @@ namespace ASPCTS.Migrations
                     b.HasOne("ASPCTS.Models.Responsavel", "Mae")
                         .WithMany()
                         .HasForeignKey("MaeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("ASPCTS.Models.Responsavel", "Pai")
                         .WithMany()
                         .HasForeignKey("PaiId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("ASPCTS.Models.Psicologo", "Psicologo")
                         .WithMany("Criancas")

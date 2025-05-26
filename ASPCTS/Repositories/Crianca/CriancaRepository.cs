@@ -55,7 +55,7 @@ namespace ASPCTS.Repositories
         public async Task<IEnumerable<Crianca>> GetCriancasPermitidasParaUsuarioAsync(int usuarioId)
         {
             return await _context.Criancas
-                .Where(c => c.PaiId == usuarioId || c.MaeId == usuarioId)
+                .Where(c => c.PaiId == usuarioId || c.MaeId == usuarioId || c.PsicologoId == usuarioId)
                 .ToListAsync();
         }
 

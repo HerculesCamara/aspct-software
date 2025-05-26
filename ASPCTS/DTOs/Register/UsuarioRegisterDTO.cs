@@ -14,7 +14,7 @@ namespace ASPCTS.DTOs.Register
         public string Phone { get; set; } = string.Empty;
         public string CPF { get; set; } = string.Empty;
         public string Tipo { get; set; } = string.Empty; // "Psicologo" ou "Responsavel"
-        public Usuario.Genero Sexo { get; set; }
+        public Usuario.Genero Sexo { get; set; } // 0 = Masculino, 1 = Feminino
         public DateTimeOffset DataNascimento { get; set; }
 
         // Somente se for Psicólogo

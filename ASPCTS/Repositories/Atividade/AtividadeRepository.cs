@@ -30,6 +30,13 @@ namespace ASPCTS.Repositories
                 .FirstOrDefaultAsync(a => a.Id == id);
         }
 
+        public async Task<IEnumerable<Atividade>> BuscarAtividadePorCriancaId(int criancaId)
+        {
+            return await _context.Atividades
+                .Where(a => a.CriancaId == criancaId)
+                .ToListAsync();
+        }
+
         public async Task<IEnumerable<Atividade>> GetAtividadeByTituloAsync(string titulo)
         {
             return await _context.Atividades
@@ -54,7 +61,7 @@ namespace ASPCTS.Repositories
             var atividade = await GetAtividadeByIdAsync(id);
             if (atividade != null)
             {
-                atividade.Ativo = false; 
+                atividade.Ativo = false;
                 _context.Atividades.Update(atividade);
                 await _context.SaveChangesAsync();
             }

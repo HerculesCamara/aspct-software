@@ -113,5 +113,17 @@ namespace ASPCTS.Controllers
 
             return Created("", new { novoUsuario.Id, novoUsuario.Name, novoUsuario.Email, novoUsuario.Tipo });
         }
+        [HttpGet("ver-claims")]
+        public IActionResult VerClaims()
+        {
+            var claims = User.Claims;
+            foreach (var claim in claims)
+            {
+                Console.WriteLine($"{claim.Type}: {claim.Value}");
+            }
+            return Ok();
+        }
+
     }
+
 }

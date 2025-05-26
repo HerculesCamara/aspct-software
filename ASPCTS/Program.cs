@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +26,8 @@ builder.Services.AddScoped<IResponsavelRepository, ResponsavelRepository>();
 builder.Services.AddScoped<IPsicologoRepository, PsicologoRepository>();
 builder.Services.AddScoped<ICriancaRepository, CriancaRepository>();
 builder.Services.AddScoped<IAtividadeRepository, AtividadeRepository>();
+builder.Services.AddScoped<IRelatorioRepository, RelatorioRepository>();
+
 
 
 // Add services to the container.
@@ -49,12 +52,11 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(
-                builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key is not configured.")
-            ))
+        ValidIssuer = "ASPCTS",
+        ValidAudience = "ASPCTSUsers",
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("MihaChaveSuperSeguraJWTcom32Bytes!!!")),
+        RoleClaimType = ClaimTypes.Role,
+        NameClaimType = ClaimTypes.NameIdentifier
     };
 });
 builder.Services.AddScoped<IAtividadeService, AtividadeService>();
@@ -63,6 +65,8 @@ builder.Services.AddScoped<IResponsavelService, ResponsavelService>();
 builder.Services.AddScoped<IPsicologoService, PsicologoService>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IRelatorioService, RelatorioService>();
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

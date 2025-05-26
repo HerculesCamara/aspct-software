@@ -20,21 +20,26 @@ namespace ASPCTS.Controllers
     public class psicologoController : ControllerBase
     {
         private readonly IPsicologoService _psicologoService;
-        private readonly IAtividadeService _atividadeService; // Serviço para atividades
+        private readonly IAtividadeService _atividadeService;
         private readonly IMapper _mapper;
         private readonly ApplicationDbContext _context;
 
         public psicologoController(IPsicologoService psicologoService, IAtividadeService atividadeService, IMapper mapper, ApplicationDbContext context)
         {
             _psicologoService = psicologoService;
-            _atividadeService = atividadeService; // Injeção de dependência do serviço de atividades
+            _atividadeService = atividadeService;
             _mapper = mapper;
             _context = context;
         }
 
+        private int ObterUsuarioId() =>
+            int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+
+        private string ObterUsuarioRole() =>
+            User.FindFirst(ClaimTypes.Role)?.Value ?? string.Empty;
+
         [Authorize(Roles = "Psicologo")]
         [HttpGet("buscar-todos-psicologos")]
-        [ProducesResponseType(typeof(IEnumerable<PsicologoDTO>), 200)]
         public async Task<IActionResult> GetAllPsicologos()
         {
             var psicologosDto = await _psicologoService.GetAllPsicologosAsync();
@@ -43,82 +48,44 @@ namespace ASPCTS.Controllers
 
         [Authorize(Roles = "Psicologo")]
         [HttpGet("buscar-psicologo-por-id/{id}")]
-        [ProducesResponseType(typeof(PsicologoDTO), 200)]
-        [ProducesResponseType(403)]
-        [ProducesResponseType(404)]
         public async Task<IActionResult> GetPsicologoById(int id)
         {
-            var usuarioId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
-            if (usuarioId != id) return Forbid();
+            if (ObterUsuarioId() != id) return Forbid();
 
             var psicologo = await _psicologoService.GetPsicologoByIdAsync(id);
-            if (psicologo == null)
-            {
-                return NotFound();
-            }
-
-            var psicologoDto = _mapper.Map<PsicologoDTO>(psicologo);
-            return Ok(psicologoDto);
+            return psicologo == null ? NotFound() : Ok(_mapper.Map<PsicologoDTO>(psicologo));
         }
 
         [Authorize(Roles = "Psicologo")]
         [HttpPatch("atualizar-psicologo/{id}")]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(403)]
-        [ProducesResponseType(404)]
-        public async Task<IActionResult> UpdatePsicologoParcial(int id, [FromBody] PsicologoUpdateDTO psicologoDto)
+        public async Task<IActionResult> UpdatePsicologoParcial(int id, [FromBody] PsicologoUpdateDTO dto)
         {
-            var usuarioId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
-            if (usuarioId != id) return Forbid();
+            if (ObterUsuarioId() != id) return Forbid();
 
-            var psicologoExistente = await _psicologoService.GetPsicologoByIdAsync(id);
-            if (psicologoExistente == null)
-            {
-                return NotFound("Psicólogo não encontrado.");
-            }
+            var psicologo = await _psicologoService.GetPsicologoByIdAsync(id);
+            if (psicologo == null) return NotFound("Psicólogo não encontrado.");
 
-            // Atualiza somente os campos enviados no DTO
-            if (!string.IsNullOrWhiteSpace(psicologoDto.Name))
-                psicologoExistente.Name = psicologoDto.Name;
+            // Aplicar atualizações
+            if (!string.IsNullOrWhiteSpace(dto.Name)) psicologo.Name = dto.Name;
+            if (!string.IsNullOrWhiteSpace(dto.Email)) psicologo.Email = dto.Email;
+            if (!string.IsNullOrWhiteSpace(dto.Password)) psicologo.Password = dto.Password;
+            if (!string.IsNullOrWhiteSpace(dto.Phone)) psicologo.Phone = dto.Phone;
+            if (!string.IsNullOrWhiteSpace(dto.CPF)) psicologo.CPF = dto.CPF;
+            if (dto.DataNascimento.HasValue) psicologo.DataNascimento = dto.DataNascimento.Value;
+            if (!string.IsNullOrWhiteSpace(dto.CRP)) psicologo.CRP = dto.CRP;
 
-            if (!string.IsNullOrWhiteSpace(psicologoDto.Email))
-                psicologoExistente.Email = psicologoDto.Email;
-
-            if (!string.IsNullOrWhiteSpace(psicologoDto.Password))
-                psicologoExistente.Password = psicologoDto.Password;
-
-            if (!string.IsNullOrWhiteSpace(psicologoDto.Phone))
-                psicologoExistente.Phone = psicologoDto.Phone;
-
-            if (!string.IsNullOrWhiteSpace(psicologoDto.CPF))
-                psicologoExistente.CPF = psicologoDto.CPF;
-
-            if (psicologoDto.DataNascimento.HasValue)
-                psicologoExistente.DataNascimento = psicologoDto.DataNascimento.Value;
-
-            if (!string.IsNullOrWhiteSpace(psicologoDto.CRP))
-                psicologoExistente.CRP = psicologoDto.CRP;
-
-            await _psicologoService.UpdatePsicologoAsync(psicologoExistente);
-
+            await _psicologoService.UpdatePsicologoAsync(psicologo);
             return NoContent();
         }
 
         [Authorize(Roles = "Psicologo")]
         [HttpDelete("desativar-psicologo/{id}")]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(403)]
-        [ProducesResponseType(404)]
         public async Task<IActionResult> DeletePsicologo(int id)
         {
-            var usuarioId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
-            if (usuarioId != id) return Forbid();
+            if (ObterUsuarioId() != id) return Forbid();
 
             var psicologo = await _psicologoService.GetPsicologoByIdAsync(id);
-            if (psicologo == null)
-            {
-                return NotFound();
-            }
+            if (psicologo == null) return NotFound();
 
             await _psicologoService.DesativarPsicologoAsync(id);
             return NoContent();
@@ -128,7 +95,7 @@ namespace ASPCTS.Controllers
         [HttpGet("minhas-criancas")]
         public async Task<IActionResult> GetMinhasCriancas()
         {
-            var usuarioId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+            var usuarioId = ObterUsuarioId();
             var criancas = await _context.Criancas
                 .Where(c => c.PsicologoId == usuarioId)
                 .ToListAsync();
@@ -136,39 +103,52 @@ namespace ASPCTS.Controllers
             return Ok(criancas);
         }
 
+        
 
         [Authorize(Roles = "Psicologo")]
         [HttpPost("criar-atividade")]
-        [ProducesResponseType(typeof(AtividadeDTO), 201)] // Retorna a atividade criada com status 201 Created
-        [ProducesResponseType(400)] // Bad Request em caso de dados inválidos
-        [ProducesResponseType(404)] // Not Found se a criança não existir
         public async Task<IActionResult> CriarAtividade([FromBody] AtividadeCreateDTO atividadeDto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var psicologoId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
-
-            // Verificar se a criança existe e está vinculada a este psicólogo (recomendado para segurança)
+            var psicologoId = ObterUsuarioId();
             var crianca = await _context.Criancas
-                                        .FirstOrDefaultAsync(c => c.Id == atividadeDto.CriancaId && c.PsicologoId == psicologoId);
+                .FirstOrDefaultAsync(c => c.Id == atividadeDto.CriancaId && c.PsicologoId == psicologoId);
 
             if (crianca == null)
-            {
                 return NotFound("Criança não encontrada ou não vinculada a este psicólogo.");
-            }
 
             var atividade = _mapper.Map<Atividade>(atividadeDto);
-            atividade.PsicologoId = psicologoId; // Associa a atividade ao psicólogo logado
+            atividade.PsicologoId = psicologoId;
             atividade.Concluida = false;
-            atividade.DataCriacao = DateTime.UtcNow; // Garante que a data de criação é definida
+            atividade.DataCriacao = DateTime.UtcNow;
 
             await _atividadeService.AddAtividadeAsync(atividade);
             var novaAtividadeDto = _mapper.Map<AtividadeDTO>(atividade);
-            
+
             return CreatedAtAction(nameof(GetMinhasCriancas), new { id = novaAtividadeDto.Id }, novaAtividadeDto);
         }
+
+        [Authorize(Roles = "Psicologo")]
+        [HttpGet("estatisticas")]
+        public async Task<IActionResult> GerarEstatisticas()
+        {
+            var psicologoId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            var criancas = await _context.Criancas
+                .Include(c => c.Atividades)
+                .Where(c => c.PsicologoId == psicologoId)
+                .ToListAsync();
+
+            var relatorios = criancas.Select(c => new
+            {
+                Crianca = c.Nome,
+                AtividadesConcluidas = c.Atividades.Count(a => a.Concluida == true),
+                AtividadesPendentes = c.Atividades.Count(a => a.Concluida == false)
+            });
+
+            return Ok(relatorios);
+        }
+
     }
 }

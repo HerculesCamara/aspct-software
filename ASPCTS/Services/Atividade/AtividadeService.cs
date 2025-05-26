@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ASPCTS.DTOs.Atividade;
 using ASPCTS.Models;
 using ASPCTS.Repositories;
 
@@ -45,10 +46,9 @@ namespace ASPCTS.Services
             var atividade = await _atividadeRepository.GetAtividadeByIdAsync(id);
             return atividade;
         }
-
-        public async Task<IEnumerable<Atividade>> GetAtividadeByTituloAsync(string titulo)
+        public async Task<IEnumerable<Atividade>> BuscarAtividadePorCriancaId(int criancaId)
         {
-            return await _atividadeRepository.GetAtividadeByTituloAsync(titulo);
+            return await _atividadeRepository.BuscarAtividadePorCriancaId(criancaId);
         }
 
         public async Task AddAtividadeAsync(Atividade atividade)
@@ -82,7 +82,7 @@ namespace ASPCTS.Services
 
         public async Task UpdateAtividadeAsync(Atividade atividade)
         {
-            
+
             await _atividadeRepository.UpdateAtividadeAsync(atividade);
         }
 

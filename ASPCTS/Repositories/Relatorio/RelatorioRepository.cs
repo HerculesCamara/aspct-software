@@ -39,12 +39,13 @@ namespace ASPCTS.Repositories
         public async Task<IEnumerable<Relatorio>> GetRelatorioByCriancaIdAsync(int criancaId)
         {
             return await _context.Relatorios
-                .Where(r => r.CriancaId == criancaId && r.Ativo)
+                .Where(r => r.CriancaId == criancaId)
                 .ToListAsync();
         }
 
+
         public async Task AddRelatorioAsync(Relatorio relatorio)
-        {   
+        {
             relatorio.Data = DateTime.UtcNow; // Define a data atual como data do relatório
             relatorio.Ativo = true; // Define o relatório como ativo ao ser criado
             _context.Relatorios.Add(relatorio);

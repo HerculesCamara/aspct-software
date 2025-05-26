@@ -30,6 +30,12 @@ namespace ASPCTS.Services
             return await _repository.GetRelatorioByIdAsync(id);
         }
 
+        public async Task<IEnumerable<Relatorio>> GetRelatorioByCriancaIdAsync(int criancaId)
+        {
+            return await _repository.GetRelatorioByCriancaIdAsync(criancaId);
+        }
+
+
         public async Task AddRelatorioAsync(Relatorio relatorio)
         {
             await _repository.AddRelatorioAsync(relatorio);

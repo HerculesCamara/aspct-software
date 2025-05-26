@@ -20,15 +20,18 @@ namespace ASPCTS.Controllers
     {
         private readonly IRelatorioService _relatorioService;
         private readonly IMapper _mapper;
+        private readonly ICriancaService _criancaService;
 
-        public relatorioController(IRelatorioService relatorioService, IMapper mapper)
+        public relatorioController(IRelatorioService relatorioService, IMapper mapper, ICriancaService criancaService)
         {
             _relatorioService = relatorioService;
+            _criancaService = criancaService;
             _mapper = mapper;
         }
 
         // GET: api/relatorio/buscar-todos-relatorios
         // Permite que psicólogos e responsáveis vejam apenas os relatórios de suas crianças
+        [Authorize(Roles = "Psicologo")]
         [HttpGet("buscar-todos-relatorios")]
         [ProducesResponseType(typeof(IEnumerable<RelatorioDTO>), 200)]
         public async Task<ActionResult<IEnumerable<RelatorioDTO>>> GetAll()
@@ -67,6 +70,7 @@ namespace ASPCTS.Controllers
 
         // GET: api/relatorio/buscar-relatorio-por-id/{id}
         // Permite que psicólogos e responsáveis vejam um relatório específico, desde que vinculado
+        [Authorize(Roles = "Psicologo")]
         [HttpGet("buscar-relatorio-por-id/{id}")]
         [ProducesResponseType(typeof(RelatorioDTO), 200)]
         [ProducesResponseType(404)]
@@ -106,10 +110,17 @@ namespace ASPCTS.Controllers
             return Ok(relatorioDto);
         }
 
+        [HttpGet("buscar-relatorio-por-crianca-id/{criancaId}")]
+        public async Task<IActionResult> GetRelatorioByCriancaIds(int criancaId)
+        {
+            var relatorios = await _relatorioService.GetRelatorioByCriancaIdAsync(criancaId);
+            return Ok(relatorios);
+        }
+
         // POST: api/relatorio/adicionar-relatorio
         // Exclusivamente para psicólogos
         [HttpPost("adicionar-relatorio")]
-        [Authorize(Roles = "Psicologo")] // Apenas psicólogos podem criar relatórios
+        [Authorize(Roles = "Psicologo")]
         [ProducesResponseType(typeof(RelatorioDTO), 201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(403)]
@@ -127,16 +138,7 @@ namespace ASPCTS.Controllers
                 return Unauthorized("ID do psicólogo não encontrado no token.");
             }
 
-            // Precisamos verificar se a criança existe e está vinculada ao psicólogo logado
-            // Assumimos que você tem um ChildService ou similar para buscar a criança
-            // Para este exemplo, vou simular a busca ou você pode injetar IChildService
-            // temporariamente vamos usar uma consulta direta ao banco de dados se _context estiver disponível
-            // ou adicionar um método GetCriancaById no IRelatorioService (ou ChildService)
-            var crianca = await _relatorioService.GetQueryableRelatorios()
-                                                .Where(r => r.CriancaId == dto.CriancaId)
-                                                .Select(r => r.Crianca)
-                                                .FirstOrDefaultAsync();
-
+            var crianca = await _criancaService.GetCriancaByIdAsync(dto.CriancaId);
             if (crianca == null)
             {
                 return NotFound("Criança não encontrada.");

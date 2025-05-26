@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace ASPCTS.Controllers
 {
     [ApiController]
@@ -20,6 +19,17 @@ namespace ASPCTS.Controllers
         private readonly IMapper _mapper;
         private readonly IJwtService _jwtService;
 
+        private int UsuarioId
+        {
+            get
+            {
+                var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (string.IsNullOrEmpty(userIdClaim))
+                    throw new UnauthorizedAccessException("Usuário não autenticado.");
+                return int.Parse(userIdClaim);
+            }
+        }
+
         public ResponsavelController(IResponsavelService responsavelService, IMapper mapper, IJwtService jwtService)
         {
             _responsavelService = responsavelService;
@@ -27,90 +37,108 @@ namespace ASPCTS.Controllers
             _jwtService = jwtService;
         }
 
-        [Authorize(Roles = "Responsavel, Psicologo")]
-        [HttpGet("me")]
+        [Authorize(Roles = "Responsavel")]
+        [HttpGet("buscar-perfil-responsavel")]
+        [ProducesResponseType(typeof(ResponsavelDTO), 200)]
+        [ProducesResponseType(404)]
         public async Task<IActionResult> GetMeuPerfil()
         {
-            var id = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var responsavel = await _responsavelService.GetResponsavelComCriancasAsync(id);
+            var responsavel = await _responsavelService.GetResponsavelComCriancasAsync(UsuarioId);
 
-            if (responsavel == null) return NotFound("Responsável não encontrado.");
+            if (responsavel == null)
+                return NotFound(new { mensagem = "Responsável não encontrado." });
 
             var dto = _mapper.Map<ResponsavelDTO>(responsavel);
             return Ok(dto);
         }
 
         [Authorize(Roles = "Responsavel")]
-        [HttpPatch("me")]
+        [HttpPatch("atualizar-meu-perfil")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
         public async Task<IActionResult> AtualizarMeuPerfil([FromBody] ResponsavelUpdateDTO dto)
         {
-            var id = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var atualizado = await _responsavelService.AtualizarResponsavelAsync(id, dto);
-            if (!atualizado) return NotFound("Responsável não encontrado.");
+            var atualizado = await _responsavelService.AtualizarResponsavelAsync(UsuarioId, dto);
+            if (!atualizado)
+                return NotFound(new { mensagem = "Responsável não encontrado." });
+
             return NoContent();
         }
 
         [Authorize(Roles = "Responsavel")]
-        [HttpDelete("me")]
+        [HttpDelete("desativar-meu-cadastro")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
         public async Task<IActionResult> DesativarMeuCadastro()
         {
-            var id = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var ok = await _responsavelService.DesativarResponsavelAsync(id);
-            return ok ? NoContent() : NotFound("Responsável não encontrado.");
+            var ok = await _responsavelService.DesativarResponsavelAsync(UsuarioId);
+            return ok ? NoContent() : NotFound(new { mensagem = "Responsável não encontrado." });
         }
 
         [Authorize(Roles = "Responsavel")]
         [HttpGet("criancas")]
+        [ProducesResponseType(200)]
         public async Task<IActionResult> MinhasCriancas()
         {
-            var id = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var criancas = await _responsavelService.GetCriancasDoResponsavelAsync(id);
+            var criancas = await _responsavelService.GetCriancasDoResponsavelAsync(UsuarioId);
             return Ok(criancas);
         }
 
         [Authorize(Roles = "Responsavel")]
         [HttpGet("atividades")]
+        [ProducesResponseType(200)]
         public async Task<IActionResult> AtividadesCriancas()
         {
-            var id = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var atividades = await _responsavelService.GetAtividadesDasCriancasAsync(id);
+            var atividades = await _responsavelService.GetAtividadesDasCriancasAsync(UsuarioId);
             return Ok(atividades);
         }
 
         [Authorize(Roles = "Responsavel")]
         [HttpGet("relatorios")]
+        [ProducesResponseType(200)]
         public async Task<IActionResult> RelatoriosCriancas()
         {
-            var id = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var relatorios = await _responsavelService.GetRelatoriosDasCriancasAsync(id);
+            var relatorios = await _responsavelService.GetRelatoriosDasCriancasAsync(UsuarioId);
             return Ok(relatorios);
         }
 
         [Authorize(Roles = "Responsavel")]
         [HttpGet("psicologo")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
         public async Task<IActionResult> PsicologoVinculado()
         {
-            var id = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var psicologo = await _responsavelService.GetPsicologoDasCriancasAsync(id);
-            return psicologo == null ? NotFound("Nenhum psicólogo vinculado.") : Ok(psicologo);
+            var psicologo = await _responsavelService.GetPsicologoDasCriancasAsync(UsuarioId);
+            return psicologo == null
+                ? NotFound(new { mensagem = "Nenhum psicólogo vinculado." })
+                : Ok(psicologo);
         }
 
         [Authorize(Roles = "Psicologo")]
         [HttpGet("meus-responsaveis")]
+        [ProducesResponseType(200)]
         public async Task<IActionResult> GetResponsaveisVinculados()
         {
-            var id = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var responsaveis = await _responsavelService.GetResponsaveisPorPsicologoAsync(id);
+            var responsaveis = await _responsavelService.GetResponsaveisPorPsicologoAsync(UsuarioId);
             return Ok(responsaveis);
         }
 
         [Authorize(Roles = "Psicologo")]
-        [HttpPatch("editar-responsavel/{responsavelId}")]
+        [HttpPatch("responsaveis/{responsavelId}/editar")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(403)]
+        [ProducesResponseType(400)]
         public async Task<IActionResult> AtualizarResponsavelComoPsicologo(int responsavelId, [FromBody] ResponsavelUpdateDTO dto)
         {
-            var psicologoId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var atualizado = await _responsavelService.AtualizarResponsavelPorPsicologoAsync(psicologoId, responsavelId, dto);
-            return atualizado ? NoContent() : Forbid("Acesso negado ou responsável não encontrado.");
+            if (dto == null)
+                return BadRequest(new { mensagem = "Dados inválidos para atualização." });
+
+            var atualizado = await _responsavelService.AtualizarResponsavelPorPsicologoAsync(UsuarioId, responsavelId, dto);
+            return atualizado
+                ? NoContent()
+                : Forbid("Acesso negado ou responsável não encontrado.");
         }
     }
 }

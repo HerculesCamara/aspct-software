@@ -16,7 +16,7 @@ namespace ASPCTS.Controllers
         private readonly ICriancaService _criancaService;
         private readonly IMapper _mapper;
 
-        public CriancaController(ICriancaService criancaService, IMapper mapper)
+        public CriancaController(ICriancaService criancaService, IMapper mapper, IAtividadeService atividadeService)
         {
             _criancaService = criancaService;
             _mapper = mapper;
@@ -27,13 +27,11 @@ namespace ASPCTS.Controllers
         [ProducesResponseType(typeof(IEnumerable<CriancaDTO>), 200)]
         public async Task<IActionResult> GetAllCriancas()
         {
-            var usuario = User;
-            var usuarioIdClaim = usuario.FindFirst(ClaimTypes.NameIdentifier);
-            if (usuarioIdClaim == null || !int.TryParse(usuarioIdClaim.Value, out int usuarioId))
-            {
-                return Unauthorized("Usuário não identificado.");
-            }
-            var criancas = await _criancaService.GetCriancasPermitidasParaUsuarioAsync(usuarioId);
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+                return Forbid();
+
+            var criancas = await _criancaService.GetCriancasPermitidasParaUsuarioAsync(userId);
             var criancasDto = _mapper.Map<IEnumerable<CriancaDTO>>(criancas);
             return Ok(criancasDto);
         }
@@ -117,5 +115,36 @@ namespace ASPCTS.Controllers
             await _criancaService.DesativarCriancaAsync(id);
             return NoContent();
         }
+
+        [HttpPost("vincular-crianca/{id}")]
+        [Authorize(Roles = "Responsavel,Psicologo")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> VincularCrianca(int id, [FromBody] CriancaVinculoDTO vinculo)
+        {
+            var crianca = await _criancaService.GetCriancaByIdAsync(id);
+            if (crianca == null)
+                return NotFound("Criança não encontrada.");
+
+            if (!await _criancaService.UsuarioTemAcessoACriancaAsync(id, User))
+                return Forbid();
+
+            // Se for psicólogo
+            if (User.IsInRole("Psicologo") && vinculo.PsicologoId.HasValue)
+                crianca.PsicologoId = (int)vinculo.PsicologoId;
+
+            // Se for Responsavel
+            if (User.IsInRole("Responsavel"))
+            {
+                if (vinculo.PaiId.HasValue)
+                    crianca.PaiId = (int)vinculo.PaiId;
+
+                if (vinculo.MaeId.HasValue)
+                    crianca.MaeId = (int)vinculo.MaeId;
+            }
+            await _criancaService.UpdateCriancaAsync(crianca);
+            return NoContent();
+        }
+
     }
 }

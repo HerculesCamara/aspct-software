@@ -12,6 +12,7 @@ namespace ASPCTS.Repositories
         Task<IEnumerable<Relatorio>> GetAllRelatorioAsync();
         Task<Relatorio?> GetRelatorioByIdAsync(int id);
         Task<IEnumerable<Relatorio>> GetRelatorioByCriancaIdAsync(int criancaId);
+
         Task AddRelatorioAsync(Relatorio relatorio);
         Task UpdateRelatorioAsync(Relatorio relatorio);
         Task DesativarRelatorioAsync(int id);

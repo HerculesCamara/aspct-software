@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using ASPCTS.Models;
 using ASPCTS.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace ASPCTS.Services
 {
@@ -40,7 +41,6 @@ namespace ASPCTS.Services
 
         public async Task<IEnumerable<Crianca>> GetCriancasPermitidasParaUsuarioAsync(int usuarioId)
         {
- 
             return await _criancaRepository.GetCriancasPermitidasParaUsuarioAsync(usuarioId);
         }
 
@@ -55,9 +55,9 @@ namespace ASPCTS.Services
             bool temMaeValida = false;
 
             // Verifica Pai (se informado)
-            if (crianca.PaiId != 0)
+            if (crianca.PaiId.HasValue && crianca.PaiId.Value != 0)
             {
-                var pai = await _responsavelRepository.GetResponsavelByIdAsync(crianca.PaiId);
+                var pai = await _responsavelRepository.GetResponsavelByIdAsync(crianca.PaiId.Value);
                 if (pai == null)
                     mensagensErro.Add("Pai não encontrado.");
                 else if (pai.Sexo != Usuario.Genero.Masculino)
@@ -67,9 +67,9 @@ namespace ASPCTS.Services
             }
 
             // Verifica Mãe (se informado)
-            if (crianca.MaeId != 0)
+            if (crianca.MaeId != 0 && crianca.MaeId.HasValue)
             {
-                var mae = await _responsavelRepository.GetResponsavelByIdAsync(crianca.MaeId);
+                var mae = await _responsavelRepository.GetResponsavelByIdAsync(crianca.MaeId.Value);
                 if (mae == null)
                     mensagensErro.Add("Mãe não encontrada.");
                 else if (mae.Sexo != Usuario.Genero.Feminino)
@@ -126,7 +126,8 @@ namespace ASPCTS.Services
         {
             if (user.Identity is not { IsAuthenticated: true }) return false;
 
-            var userId = int.Parse(user.FindFirst("id")?.Value ?? "0");
+            var userId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+
             var userRole = user.FindFirst(ClaimTypes.Role)?.Value ?? "";
 
             return await _criancaRepository.UsuarioTemAcessoACriancaAsync(criancaId, userId, userRole);

@@ -8,6 +8,7 @@ using ASPCTS.DTOs.Responsavel;
 using ASPCTS.DTOs.Psicologo;
 using ASPCTS.Models;
 using AutoMapper;
+using ASPCTS.DTOs.Relatorio;
 
 namespace ASPCTS.Mappings
 {
@@ -39,6 +40,11 @@ namespace ASPCTS.Mappings
             CreateMap<Atividade, AtividadeDTO>().ReverseMap();
             CreateMap<Atividade, AtividadeCreateDTO>().ReverseMap();
             CreateMap<Atividade, AtividadeUpdateDTO>().ReverseMap();
+
+            // Relatório
+            CreateMap<RelatorioCreateDTO, Relatorio>();
+            CreateMap<Relatorio, RelatorioDTO>();
+            CreateMap<RelatorioUpdateDTO, Relatorio>();
         }
 
     }

@@ -12,15 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ASPCTS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250421140503_CorrigeRelacionamentos")]
-    partial class CorrigeRelacionamentos
+    [Migration("20250526171341_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.4")
+                .HasAnnotation("ProductVersion", "9.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -33,7 +33,10 @@ namespace ASPCTS.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<bool>("Concluida")
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("Concluida")
                         .HasColumnType("bit");
 
                     b.Property<int>("CriancaId")
@@ -49,6 +52,9 @@ namespace ASPCTS.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("PsicologoId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Titulo")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -56,6 +62,8 @@ namespace ASPCTS.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CriancaId");
+
+                    b.HasIndex("PsicologoId");
 
                     b.ToTable("Atividades");
                 });
@@ -68,26 +76,91 @@ namespace ASPCTS.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("Idade")
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset>("DataNascimento")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("MaeId")
                         .HasColumnType("int");
 
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PaiId")
+                    b.Property<int?>("PaiId")
                         .HasColumnType("int");
 
                     b.Property<int>("PsicologoId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ResponsavelId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("MaeId");
 
                     b.HasIndex("PaiId");
 
                     b.HasIndex("PsicologoId");
 
+                    b.HasIndex("ResponsavelId");
+
                     b.ToTable("Criancas");
+                });
+
+            modelBuilder.Entity("ASPCTS.Models.Relatorio", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("CriancaId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Data")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("MarcosAlcancados")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Observacoes")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RecomendacoesCasa")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RecomendacoesEscola")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Resumo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Titulo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CriancaId");
+
+                    b.ToTable("Relatorios");
                 });
 
             modelBuilder.Entity("ASPCTS.Models.Usuario", b =>
@@ -97,6 +170,16 @@ namespace ASPCTS.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("CPF")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("DataNascimento")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -114,6 +197,9 @@ namespace ASPCTS.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Sexo")
+                        .HasColumnType("int");
+
                     b.Property<string>("Tipo")
                         .IsRequired()
                         .HasMaxLength(13)
@@ -128,18 +214,6 @@ namespace ASPCTS.Migrations
                     b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("ASPCTS.Models.Pai", b =>
-                {
-                    b.HasBaseType("ASPCTS.Models.Usuario");
-
-                    b.Property<int?>("PsicologoId")
-                        .HasColumnType("int");
-
-                    b.HasIndex("PsicologoId");
-
-                    b.HasDiscriminator().HasValue("Pai");
-                });
-
             modelBuilder.Entity("ASPCTS.Models.Psicologo", b =>
                 {
                     b.HasBaseType("ASPCTS.Models.Usuario");
@@ -151,6 +225,18 @@ namespace ASPCTS.Migrations
                     b.HasDiscriminator().HasValue("Psicologo");
                 });
 
+            modelBuilder.Entity("ASPCTS.Models.Responsavel", b =>
+                {
+                    b.HasBaseType("ASPCTS.Models.Usuario");
+
+                    b.Property<int?>("PsicologoId")
+                        .HasColumnType("int");
+
+                    b.HasIndex("PsicologoId");
+
+                    b.HasDiscriminator().HasValue("Responsavel");
+                });
+
             modelBuilder.Entity("ASPCTS.Models.Atividade", b =>
                 {
                     b.HasOne("ASPCTS.Models.Crianca", "Crianca")
@@ -159,16 +245,28 @@ namespace ASPCTS.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("ASPCTS.Models.Psicologo", "Psicologo")
+                        .WithMany()
+                        .HasForeignKey("PsicologoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Crianca");
+
+                    b.Navigation("Psicologo");
                 });
 
             modelBuilder.Entity("ASPCTS.Models.Crianca", b =>
                 {
-                    b.HasOne("ASPCTS.Models.Pai", "Pai")
-                        .WithMany("Criancas")
+                    b.HasOne("ASPCTS.Models.Responsavel", "Mae")
+                        .WithMany()
+                        .HasForeignKey("MaeId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("ASPCTS.Models.Responsavel", "Pai")
+                        .WithMany()
                         .HasForeignKey("PaiId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("ASPCTS.Models.Psicologo", "Psicologo")
                         .WithMany("Criancas")
@@ -176,12 +274,29 @@ namespace ASPCTS.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("ASPCTS.Models.Responsavel", null)
+                        .WithMany("Criancas")
+                        .HasForeignKey("ResponsavelId");
+
+                    b.Navigation("Mae");
+
                     b.Navigation("Pai");
 
                     b.Navigation("Psicologo");
                 });
 
-            modelBuilder.Entity("ASPCTS.Models.Pai", b =>
+            modelBuilder.Entity("ASPCTS.Models.Relatorio", b =>
+                {
+                    b.HasOne("ASPCTS.Models.Crianca", "Crianca")
+                        .WithMany()
+                        .HasForeignKey("CriancaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Crianca");
+                });
+
+            modelBuilder.Entity("ASPCTS.Models.Responsavel", b =>
                 {
                     b.HasOne("ASPCTS.Models.Psicologo", "Psicologo")
                         .WithMany()
@@ -195,12 +310,12 @@ namespace ASPCTS.Migrations
                     b.Navigation("Atividades");
                 });
 
-            modelBuilder.Entity("ASPCTS.Models.Pai", b =>
+            modelBuilder.Entity("ASPCTS.Models.Psicologo", b =>
                 {
                     b.Navigation("Criancas");
                 });
 
-            modelBuilder.Entity("ASPCTS.Models.Psicologo", b =>
+            modelBuilder.Entity("ASPCTS.Models.Responsavel", b =>
                 {
                     b.Navigation("Criancas");
                 });
