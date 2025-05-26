@@ -223,12 +223,23 @@ Este comando fará o download e instalará todos os pacotes listados no ItemGrou
 \* Abra o arquivo appsettings.json na raiz do projeto.
 
 \* Localize a seção ConnectionStrings. A string de conexão padrão é configurada para uma instância local do SQL Server Express:
+```
+"ConnectionStrings": { "ConexaoPadrao": "Server=localhost\\SQLEXPRESS;Database=ASPCTSDB;Trusted\_Connection=True;TrustServerCertificate=True;" }
+```
+\* Crucial: Certifique-se de que o nome do servidor 
+```
+(localhost\\SQLEXPRESS neste exemplo)
+```
+ e a configuração de autenticação 
+ ```
+ (Trusted\_Connection=True para autenticação Windows integrada)
+ ```
+  correspondem à sua configuração local do SQL Server.
 
-json "ConnectionStrings": { "ConexaoPadrao": "Server=localhost\\SQLEXPRESS;Database=ASPCTSDB;Trusted\_Connection=True;TrustServerCertificate=True;" }
-
-\* Crucial: Certifique-se de que o nome do servidor (localhost\\SQLEXPRESS neste exemplo) e a configuração de autenticação (Trusted\_Connection=True para autenticação Windows integrada) correspondem à sua configuração local do SQL Server.
-
-\* Se você estiver usando SQL Server com autenticação de usuário/senha, a string de conexão precisará ser adaptada (e.g., User ID=seu\_usuario;Password=sua\_senha;).
+\* Se você estiver usando SQL Server com autenticação de usuário/senha, a string de conexão precisará ser adaptada 
+```
+(e.g., User ID=seu\_usuario;Password=sua\_senha;).
+```
 
 \* Certificado do Servidor: TrustServerCertificate=True é usado para permitir conexões sem validação de certificado TLS/SSL, o que é comum em ambientes de desenvolvimento local. Em ambientes de produção, é recomendado configurar a validação de certificado.
 
@@ -239,25 +250,25 @@ json "ConnectionStrings": { "ConexaoPadrao": "Server=localhost\\SQLEXPRESS;Datab
 \* Abrir um terminal (Prompt de Comando, PowerShell ou Terminal integrado do VS Code/Visual Studio) na raiz do projeto ASPCTS (onde o arquivo ASPCTS.csproj está localizado).
 
 \* Execute o seguinte comando para aplicar todas as migrações pendentes e criar o banco de dados ASPCTSDB (se ele ainda não existir) com as tabelas correspondentes aos seus modelos. Este comando também irá atualizar o esquema do banco de dados se houver novas migrações que foram adicionadas:
-
+```
 bash dotnet ef database update
-
+```
 \* Comandos Adicionais para Migrações (para Desenvolvedores):
 
 \* Para criar uma nova migração (após alterar seus modelos):
-
-bash dotnet ef migrations add NomeDaSuaNovaMigracao
-
+```
+dotnet ef migrations add NomeDaSuaNovaMigracao
+```
 Isso gerará um novo arquivo na pasta Migrations detalhando as alterações no esquema.
 
 \* Para remover a última migração aplicada (cuidado):
-
+```
 bash dotnet ef migrations remove
-
+```
 \* Para reverter para uma migração específica (cuidado):
-
+```
 bash dotnet ef database update NomeDaMigracaoAnterior
-
+```
 Para reverter todas as migrações e retornar o banco de dados a um estado inicial (sem tabelas), use:
 
 bash dotnet ef database update 0
@@ -275,9 +286,9 @@ bash dotnet ef database update 0
 \* Abrir o terminal na raiz do projeto ASPCTS.
 
 \* Execute o seguinte comando para compilar e iniciar a aplicação:
-
-bash dotnet run
-
+```
+dotnet run
+```
 \* O terminal exibirá as URLs onde a aplicação está ouvindo (geralmente https://localhost:7060 e http://localhost:5023). Copie e cole a URL HTTPS no seu navegador.
 ### **5. Acessar a API e Documentação Swagger**
 Após a execução bem-sucedida, a API estará acessível em:
