@@ -13,5 +13,14 @@ namespace ASPCTS.Models
 
         public int? PsicologoId { get; set; }
         public Psicologo? Psicologo { get; set; }
+
+        //Responsavel é pai ou mãe?
+        public string Parentesco
+        {
+            get
+            {
+                return Sexo == Genero.Masculino ? "Pai" : "Mãe";
+            }
+        }
     }
 }

@@ -18,6 +18,8 @@ namespace ASPCTS.Context
         public DbSet<Models.Atividade> Atividades { get; set; } = null!;
         public DbSet<Models.Crianca> Criancas { get; set; } = null!;
         public DbSet<Models.Usuario> Usuarios { get; set; } = null!;
+        public DbSet<Responsavel> Responsaveis { get; set; } = null!;
+        public DbSet<Psicologo> Psicologos { get; set; } = null!;
         public DbSet<Relatorio> Relatorios { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

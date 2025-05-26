@@ -17,6 +17,9 @@ namespace ASPCTS.Models
         // Relacionamento com a criança
         public int CriancaId { get; set; }
         public Crianca? Crianca { get; set; }
+        // Relacionamento com o psicólogo
+        public int PsicologoId { get; set; }
+        public Psicologo? Psicologo { get; set; }
         public bool Ativo { get; set; } = true;
     }
 }

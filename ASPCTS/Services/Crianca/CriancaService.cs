@@ -38,6 +38,12 @@ namespace ASPCTS.Services
             return await _criancaRepository.GetCriancaByPaiIdAsync(idPai);
         }
 
+        public async Task<IEnumerable<Crianca>> GetCriancasPermitidasParaUsuarioAsync(int usuarioId)
+        {
+ 
+            return await _criancaRepository.GetCriancasPermitidasParaUsuarioAsync(usuarioId);
+        }
+
         public async Task AddCriancaAsync(Crianca crianca)
         {
             var mensagensErro = new List<string>();

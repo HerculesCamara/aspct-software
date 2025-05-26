@@ -12,6 +12,8 @@ namespace ASPCTS.Repositories
         Task<Crianca?> GetCriancaByIdAsync(int id);
         Task<IEnumerable<Crianca>> GetCriancaByNameAsync(string name);
         Task<Crianca?> GetCriancaByPaiIdAsync(int idPai);
+        Task<IEnumerable<Crianca>> GetCriancasPermitidasParaUsuarioAsync(int usuarioId);
+
         Task AddCriancaAsync(Crianca crianca);
         Task UpdateCriancaAsync(Crianca crianca);
         Task DesativarCriancaAsync(int id);

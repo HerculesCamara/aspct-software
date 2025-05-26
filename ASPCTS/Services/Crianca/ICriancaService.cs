@@ -11,6 +11,8 @@ namespace ASPCTS.Services
     {
         Task<IEnumerable<Crianca>> GetAllCriancasAsync();
         Task<Crianca?> GetCriancaByIdAsync(int id);
+        Task<IEnumerable<Crianca>> GetCriancasPermitidasParaUsuarioAsync(int usuarioId);
+
         Task AddCriancaAsync(Crianca crianca);
         Task UpdateCriancaAsync(Crianca crianca);
         Task DesativarCriancaAsync(int id);

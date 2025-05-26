@@ -5,12 +5,14 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using ASPCTS.Context;
 using ASPCTS.DTOs.Psicologo;
+using ASPCTS.DTOs.Atividade;
 using ASPCTS.Models;
 using ASPCTS.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ASPCTS.DTOs.Relatorio;
 
 namespace ASPCTS.Controllers
 {
@@ -19,12 +21,14 @@ namespace ASPCTS.Controllers
     public class psicologoController : ControllerBase
     {
         private readonly IPsicologoService _psicologoService;
+        private readonly IAtividadeService _atividadeService;
         private readonly IMapper _mapper;
         private readonly ApplicationDbContext _context;
 
-        public psicologoController(IPsicologoService psicologoService, IMapper mapper, ApplicationDbContext context)
+        public psicologoController(IPsicologoService psicologoService, IAtividadeService atividadeService, IMapper mapper, ApplicationDbContext context)
         {
             _psicologoService = psicologoService;
+            _atividadeService = atividadeService;
             _mapper = mapper;
             _context = context;
         }
@@ -56,32 +60,6 @@ namespace ASPCTS.Controllers
 
             var psicologoDto = _mapper.Map<PsicologoDTO>(psicologo);
             return Ok(psicologoDto);
-        }
-
-        [HttpPost("adicionar-psicologo")]
-        [ProducesResponseType(typeof(PsicologoDTO), 201)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(409)]
-        public async Task<IActionResult> AddPsicologo(PsicologoCreateDTO novoPsicologoDto)
-        {
-            if (novoPsicologoDto == null)
-            {
-                return BadRequest("Dados inválidos.");
-            }
-
-            var existingPsicologo = await _psicologoService.GetPsicologosByCPFAsync(novoPsicologoDto.CPF);
-            if (existingPsicologo != null)
-            {
-                return Conflict("Já existe um psicólogo cadastrado com esse CPF.");
-            }
-
-            var psicologo = _mapper.Map<Psicologo>(novoPsicologoDto);
-            psicologo.Tipo = "Psicologo";
-
-            await _psicologoService.AddPsicologoAsync(psicologo);
-            var novoPsicologo = _mapper.Map<PsicologoDTO>(psicologo);
-
-            return CreatedAtAction(nameof(GetPsicologoById), new { id = psicologo.Id }, novoPsicologo);
         }
 
         [Authorize(Roles = "Psicologo")]

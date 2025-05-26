@@ -17,54 +17,65 @@ namespace ASPCTS.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<Responsavel>> GetAllResponsaveisAsync()
+        public async Task<Responsavel?> GetByIdAsync(int id) =>
+            await _context.Responsaveis.FindAsync(id);
+
+        public async Task UpdateAsync(Responsavel responsavel)
         {
-            return await _context.Usuarios.
-                OfType<Responsavel>().
-                ToListAsync();
+            _context.Responsaveis.Update(responsavel);
+            await _context.SaveChangesAsync();
         }
 
-        public async Task<Responsavel?> GetResponsavelByIdAsync(int id)
-        {
-            return await _context.Usuarios.
-                OfType<Responsavel>().
-                FirstOrDefaultAsync(p => p.Id == id);
-        }
-        public async Task<Responsavel?> GetResponsavelByEmailAsync(string email)
-        {
-            return await _context.Usuarios.
-                OfType<Responsavel>()
-                .FirstOrDefaultAsync(p => p.Email == email);
-        }
-        public async Task<IEnumerable<Responsavel>> GetResponsaveisByCPFAsync(string cpf)
-        {
-            return await _context.Usuarios.
-                OfType<Responsavel>()
-                .Where(p => p.CPF == cpf)
+        public async Task<Responsavel?> GetResponsavelComCriancasAsync(int id) =>
+            await _context.Responsaveis
+                .Include(r => r.Criancas)
+                .FirstOrDefaultAsync(r => r.Id == id);
+
+        public async Task<IEnumerable<Crianca>> GetCriancasByResponsavelIdAsync(int responsavelId) =>
+            await _context.Criancas
+                .Where(c => c.PaiId == responsavelId || c.MaeId == responsavelId)
                 .ToListAsync();
-        }
 
-        public async Task AddResponsavelAsync(Responsavel responsavel)
-        {
-            await _context.Usuarios.AddAsync(responsavel);
-            await _context.SaveChangesAsync();
-        }
+        public async Task<IEnumerable<Atividade>> GetAtividadesByResponsavelIdAsync(int responsavelId) =>
+            await _context.Atividades
+                .Where(a => a.Crianca != null && (a.Crianca.PaiId == responsavelId || a.Crianca.MaeId == responsavelId))
+                .Include(a => a.Crianca)
+                .ToListAsync();
 
-        public async Task UpdateResponsavelAsync(Responsavel responsavel)
-        {
-            _context.Usuarios.Update(responsavel);
-            await _context.SaveChangesAsync();
-        }
+        public async Task<IEnumerable<Relatorio>> GetRelatoriosByResponsavelIdAsync(int responsavelId) =>
+            await _context.Relatorios
+                .Where(r => r.Crianca != null && (r.Crianca.PaiId == responsavelId || r.Crianca.MaeId == responsavelId))
+                .Include(r => r.Crianca)
+                .ToListAsync();
 
-        public async Task DesativarResponsavelAsync(int id)
-        {
-            var responsavel = await GetResponsavelByIdAsync(id);
-            if (responsavel != null)
-            {
-                responsavel.Ativo = false; // Desativa o Responsavel
-                _context.Usuarios.Update(responsavel);
-                await _context.SaveChangesAsync();
-            }
-        }
+        public async Task<Psicologo?> GetPsicologoByResponsavelIdAsync(int responsavelId) =>
+            await _context.Criancas
+                .Where(c => c.PaiId == responsavelId || c.MaeId == responsavelId)
+                .Select(c => c.Psicologo)
+                .FirstOrDefaultAsync();
+
+        public async Task<IEnumerable<Responsavel>> GetResponsaveisByPsicologoIdAsync(int psicologoId) =>
+            await _context.Criancas
+                .Where(c => c.PsicologoId == psicologoId)
+                .SelectMany(c => new[] { c.Pai, c.Mae })
+                .OfType<Responsavel>()
+                .Distinct()
+                .ToListAsync();
+
+        public async Task<Responsavel?> GetResponsavelByIdAndPsicologoIdAsync(int responsavelId, int psicologoId) =>
+            await _context.Criancas
+                .Where(c => c.PsicologoId == psicologoId &&
+                           (c.PaiId == responsavelId || c.MaeId == responsavelId))
+                .SelectMany(c => new[] { c.Pai, c.Mae })
+                .FirstOrDefaultAsync(r => r.Id == responsavelId);
+
+        public async Task<Responsavel?> GetResponsavelByIdAsync(int id) =>
+            await _context.Responsaveis
+                .Include(r => r.Criancas)
+                .FirstOrDefaultAsync(r => r.Id == id);
+        public async Task<Responsavel?> GetResponsavelByEmailAsync(string email) =>
+            await _context.Responsaveis
+                .FirstOrDefaultAsync(r => r.Email == email);
     }
+
 }

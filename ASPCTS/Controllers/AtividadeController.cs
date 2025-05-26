@@ -93,7 +93,11 @@ namespace ASPCTS.Controllers
             if (role == "Responsavel")
             {
                 if (dto.Concluida.HasValue)
+                {
+                    atividade.Concluida = dto.Concluida.Value;
                     atividade.Ativo = dto.Concluida.Value;
+                    atividade.DataConclusao = dto.Concluida.Value ? DateTime.UtcNow : null;
+                }
             }
             else if (role == "Psicologo")
             {
@@ -104,13 +108,11 @@ namespace ASPCTS.Controllers
                 if (dto.Concluida.HasValue)
                 {
                     atividade.Concluida = dto.Concluida.Value;
-                    if (atividade.Concluida.Value)
-                        atividade.DataConclusao = DateTime.UtcNow;
+                    atividade.Ativo = dto.Concluida.Value;
+                    atividade.DataConclusao = dto.Concluida.Value ? DateTime.UtcNow : null;
                 }
                 if (dto.DataConclusao.HasValue)
                     atividade.DataConclusao = dto.DataConclusao;
-                if (dto.Concluida.HasValue)
-                    atividade.Ativo = dto.Concluida.Value;
             }
 
             await _atividadeService.UpdateAtividadeAsync(atividade);

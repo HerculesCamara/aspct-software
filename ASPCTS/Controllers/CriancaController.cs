@@ -11,12 +11,12 @@ namespace ASPCTS.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class criancaController : ControllerBase
+    public class CriancaController : ControllerBase
     {
         private readonly ICriancaService _criancaService;
         private readonly IMapper _mapper;
 
-        public criancaController(ICriancaService criancaService, IMapper mapper)
+        public CriancaController(ICriancaService criancaService, IMapper mapper)
         {
             _criancaService = criancaService;
             _mapper = mapper;
@@ -27,18 +27,14 @@ namespace ASPCTS.Controllers
         [ProducesResponseType(typeof(IEnumerable<CriancaDTO>), 200)]
         public async Task<IActionResult> GetAllCriancas()
         {
-            var criancas = await _criancaService.GetAllCriancasAsync();
             var usuario = User;
-
-            // Filtrar só crianças que o usuário tem acesso
-            var criancasFiltradas = new List<Crianca>();
-            foreach(var c in criancas)
+            var usuarioIdClaim = usuario.FindFirst(ClaimTypes.NameIdentifier);
+            if (usuarioIdClaim == null || !int.TryParse(usuarioIdClaim.Value, out int usuarioId))
             {
-                if (await _criancaService.UsuarioTemAcessoACriancaAsync(c.Id, usuario))
-                    criancasFiltradas.Add(c);
+                return Unauthorized("Usuário não identificado.");
             }
-
-            var criancasDto = _mapper.Map<IEnumerable<CriancaDTO>>(criancasFiltradas);
+            var criancas = await _criancaService.GetCriancasPermitidasParaUsuarioAsync(usuarioId);
+            var criancasDto = _mapper.Map<IEnumerable<CriancaDTO>>(criancas);
             return Ok(criancasDto);
         }
 
@@ -47,12 +43,12 @@ namespace ASPCTS.Controllers
         [ProducesResponseType(typeof(CriancaDTO), 200)]
         public async Task<IActionResult> GetCriancaById(int id)
         {
+            if (!await _criancaService.UsuarioTemAcessoACriancaAsync(id, User))
+                return Forbid();
+
             var crianca = await _criancaService.GetCriancaByIdAsync(id);
             if (crianca == null)
                 return NotFound();
-
-            if (!await _criancaService.UsuarioTemAcessoACriancaAsync(id, User))
-                return Forbid();
 
             var criancaDto = _mapper.Map<CriancaDTO>(crianca);
             return Ok(criancaDto);
@@ -80,12 +76,12 @@ namespace ASPCTS.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> AtualizarCriancaParcial(int id, [FromBody] CriancaUpdateDTO criancaDto)
         {
+            if (!await _criancaService.UsuarioTemAcessoACriancaAsync(id, User))
+                return Forbid();
+
             var criancaExistente = await _criancaService.GetCriancaByIdAsync(id);
             if (criancaExistente == null)
                 return NotFound("Criança não encontrada.");
-
-            if (!await _criancaService.UsuarioTemAcessoACriancaAsync(id, User))
-                return Forbid();
 
             // Atualiza apenas os campos que foram enviados no DTO
             if (!string.IsNullOrWhiteSpace(criancaDto.Nome))
@@ -111,12 +107,12 @@ namespace ASPCTS.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> DeleteCrianca(int id)
         {
+            if (!await _criancaService.UsuarioTemAcessoACriancaAsync(id, User))
+                return Forbid();
+
             var crianca = await _criancaService.GetCriancaByIdAsync(id);
             if (crianca == null)
                 return NotFound();
-
-            if (!await _criancaService.UsuarioTemAcessoACriancaAsync(id, User))
-                return Forbid();
 
             await _criancaService.DesativarCriancaAsync(id);
             return NoContent();

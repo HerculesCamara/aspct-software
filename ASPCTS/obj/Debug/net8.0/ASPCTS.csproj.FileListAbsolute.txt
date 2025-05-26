@@ -681,3 +681,5 @@ C:\Users\gustavo.moreira\Desktop\TCC\aspct-software\aspcts\obj\Debug\net8.0\ASPC
 C:\Users\gustavo.moreira\Desktop\TCC\aspct-software\aspcts\obj\Debug\net8.0\ASPCTS.genruntimeconfig.cache
 C:\Users\gustavo.moreira\Desktop\TCC\aspct-software\aspcts\obj\Debug\net8.0\ref\ASPCTS.dll
 C:\Users\gustavo.moreira\Desktop\TCC\aspct-software\ASPCTS\bin\Debug\net8.0\BCrypt.Net-Next.dll
+C:\Users\gusta\Desktop\API\aspcts\bin\Debug\net8.0\BCrypt.Net-Next.dll
+C:\Users\gusta\Desktop\API\aspcts\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll

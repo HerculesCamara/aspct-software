@@ -52,6 +52,13 @@ namespace ASPCTS.Repositories
                 .FirstOrDefaultAsync(c => c.PaiId == idPai);
         }
 
+        public async Task<IEnumerable<Crianca>> GetCriancasPermitidasParaUsuarioAsync(int usuarioId)
+        {
+            return await _context.Criancas
+                .Where(c => c.PaiId == usuarioId || c.MaeId == usuarioId)
+                .ToListAsync();
+        }
+
         public async Task AddCriancaAsync(Crianca crianca)
         {
             await _context.Criancas.AddAsync(crianca);
