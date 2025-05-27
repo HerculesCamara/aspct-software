@@ -5,7 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using ASPCTS.Context;
 using ASPCTS.DTOs.Psicologo;
-using ASPCTS.DTOs.Atividade; // Certifique-se de ter este DTO
+using ASPCTS.DTOs.Atividade;
 using ASPCTS.Models;
 using ASPCTS.Services;
 using AutoMapper;
@@ -17,14 +17,14 @@ namespace ASPCTS.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class psicologoController : ControllerBase
+    public class PsicologoController : ControllerBase
     {
         private readonly IPsicologoService _psicologoService;
         private readonly IAtividadeService _atividadeService;
         private readonly IMapper _mapper;
         private readonly ApplicationDbContext _context;
 
-        public psicologoController(IPsicologoService psicologoService, IAtividadeService atividadeService, IMapper mapper, ApplicationDbContext context)
+        public PsicologoController(IPsicologoService psicologoService, IAtividadeService atividadeService, IMapper mapper, ApplicationDbContext context)
         {
             _psicologoService = psicologoService;
             _atividadeService = atividadeService;

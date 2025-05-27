@@ -14,14 +14,14 @@ namespace ASPCTS.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class authController : ControllerBase
+    public class AuthController : ControllerBase
     {
         private readonly IResponsavelService _responsavelService;
         private readonly IPsicologoService _psicologoService;
         private readonly IJwtService _jwtService;
         private readonly ApplicationDbContext _context;
 
-        public authController(IResponsavelService responsavelService, IPsicologoService psicologoService, IJwtService jwtService, ApplicationDbContext context)
+        public AuthController(IResponsavelService responsavelService, IPsicologoService psicologoService, IJwtService jwtService, ApplicationDbContext context)
         {
             _responsavelService = responsavelService;
             _psicologoService = psicologoService;

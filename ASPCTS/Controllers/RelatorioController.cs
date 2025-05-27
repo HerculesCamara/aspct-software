@@ -9,20 +9,20 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ASPCTS.DTOs.Relatorio;
 using AutoMapper;
-using System.Security.Claims; // Necessário para ClaimTypes
+using System.Security.Claims;
 
 namespace ASPCTS.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize] // Garante que todos os endpoints aqui exigem autenticação
-    public class relatorioController : ControllerBase
+    [Authorize]
+    public class RelatorioController : ControllerBase
     {
         private readonly IRelatorioService _relatorioService;
         private readonly IMapper _mapper;
         private readonly ICriancaService _criancaService;
 
-        public relatorioController(IRelatorioService relatorioService, IMapper mapper, ICriancaService criancaService)
+        public RelatorioController(IRelatorioService relatorioService, IMapper mapper, ICriancaService criancaService)
         {
             _relatorioService = relatorioService;
             _criancaService = criancaService;
@@ -58,8 +58,6 @@ namespace ASPCTS.Controllers
             }
             else
             {
-                // Se o tipo de usuário não for Psicólogo nem Responsável, não retorna nada.
-                // Ou você pode retornar Forbid(), dependendo da sua política de segurança.
                 return Forbid("Seu tipo de usuário não tem permissão para acessar relatórios.");
             }
 

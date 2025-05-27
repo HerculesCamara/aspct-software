@@ -13,13 +13,13 @@ namespace ASPCTS.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class atividadeController : ControllerBase
+    public class AtividadeController : ControllerBase
     {
         private readonly IAtividadeService _atividadeService;
         private readonly ICriancaService _criancaService;
         private readonly IMapper _mapper;
 
-        public atividadeController(IAtividadeService atividadeService, ICriancaService criancaService, IMapper mapper)
+        public AtividadeController(IAtividadeService atividadeService, ICriancaService criancaService, IMapper mapper)
         {
             _atividadeService = atividadeService;
             _criancaService = criancaService;
